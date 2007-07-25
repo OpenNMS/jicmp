@@ -52,8 +52,12 @@ ONMS_CHECK_IP_STRUCT([iphdr])
 ONMS_CHECK_IP_STRUCT([icmp],    [#include <netinet/ip_icmp.h>])
 ONMS_CHECK_IP_STRUCT([icmphdr], [#include <netinet/ip_icmp.h] )
 
-ONMS_CHECK_IP_STRUCT_ENTRY([IP_HL], [ip_hl])
-ONMS_CHECK_IP_STRUCT_ENTRY([IP_HL], [ihl])
+ONMS_CHECK_IP_STRUCT_ENTRY([HL], [ip_hl])
+ONMS_CHECK_IP_STRUCT_ENTRY([HL], [ihl])
+ONMS_CHECK_ICMP_STRUCT_ENTRY([TYPE], [icmp_type])
+ONMS_CHECK_ICMP_STRUCT_ENTRY([TYPE], [type])
+ONMS_CHECK_ICMP_STRUCT_ENTRY([CHECKSUM], [icmp_cksum])
+ONMS_CHECK_ICMP_STRUCT_ENTRY([CHECKSUM], [checksum])
 
 AC_CHECK_TYPE([struct timeval],
 	[],

@@ -508,8 +508,8 @@ Java_org_opennms_protocols_icmp_IcmpSocket_receive (JNIEnv *env, jobject instanc
 	 * header from the message. Don't forget to decrement
 	 * the bytes received by the size of the IP header.
 	 *
-	 * NOTE: The IP_HL field of the IP header is the number
-	 * of 4 byte values in the header. Thus the IP_HL must
+	 * NOTE: The ip_hl field of the IP header is the number
+	 * of 4 byte values in the header. Thus the ip_hl must
 	 * be multiplied by 4 (or shifted 2 bits).
 	 */
 	ipHdr = (iphdr_t *)inBuf;
@@ -529,16 +529,9 @@ Java_org_opennms_protocols_icmp_IcmpSocket_receive (JNIEnv *env, jobject instanc
 	 *
 	 * Don't forget to check for a buffer overflow!
 	 */
-#if defined(__SOLARIS__) || defined(__DARWIN__) || defined(__FreeBSD__)
 	if(iRC >= (OPENNMS_TAG_OFFSET + OPENNMS_TAG_LEN)
-	   && icmpHdr->icmp_type == 0
+	   && icmpHdr->ICMP_TYPE == 0
 	   && memcmp((char *)icmpHdr + OPENNMS_TAG_OFFSET, OPENNMS_TAG, OPENNMS_TAG_LEN) == 0)
-#else
-
-	if(iRC >= (OPENNMS_TAG_OFFSET + OPENNMS_TAG_LEN)
-	   && icmpHdr->type == 0
-	   && memcmp((char *)icmpHdr + OPENNMS_TAG_OFFSET, OPENNMS_TAG, OPENNMS_TAG_LEN) == 0)
-#endif
 	{
 		uint64_t now;
 		uint64_t sent;
@@ -785,15 +778,9 @@ Java_org_opennms_protocols_icmp_IcmpSocket_send (JNIEnv *env, jobject instance, 
 	 * Don't forget to check for a potential buffer
 	 * overflow!
 	 */
-#if defined(__SOLARIS__) || defined(__DARWIN__) || defined(__FreeBSD__)
 	if(bufferLen >= (OPENNMS_TAG_OFFSET + OPENNMS_TAG_LEN)
-	   && ((icmphdr_t *)outBuffer)->icmp_type == 0x08
+	   && ((icmphdr_t *)outBuffer)->ICMP_TYPE == 0x08
 	   && memcmp((char *)outBuffer + OPENNMS_TAG_OFFSET, OPENNMS_TAG, OPENNMS_TAG_LEN) == 0)
-#else
-	if(bufferLen >= (OPENNMS_TAG_OFFSET + OPENNMS_TAG_LEN)
-	   && ((icmphdr_t *)outBuffer)->type == 0x08
-	   && memcmp((char *)outBuffer + OPENNMS_TAG_OFFSET, OPENNMS_TAG, OPENNMS_TAG_LEN) == 0)
-#endif
 	{
 		uint64_t now = 0;
 
@@ -805,13 +792,8 @@ Java_org_opennms_protocols_icmp_IcmpSocket_send (JNIEnv *env, jobject instance, 
 		memcpy((char *)outBuffer + SENTTIME_OFFSET, (char *)&now, TIME_LENGTH);
 
 		/* recompute the checksum */
-#if defined(__SOLARIS__) || defined(__DARWIN__) || defined(__FreeBSD__)
-		((icmphdr_t *)outBuffer)->icmp_cksum = 0;
-		((icmphdr_t *)outBuffer)->icmp_cksum = checksum((unsigned short *)outBuffer, bufferLen);
-#else
-		((icmphdr_t *)outBuffer)->checksum = 0;
-		((icmphdr_t *)outBuffer)->checksum = checksum((unsigned short *)outBuffer, bufferLen);
-#endif
+		((icmphdr_t *)outBuffer)->ICMP_CHECKSUM = 0;
+		((icmphdr_t *)outBuffer)->ICMP_CHECKSUM = checksum((unsigned short *)outBuffer, bufferLen);
 	}
 
 	/**
