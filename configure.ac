@@ -39,7 +39,7 @@ AC_CHECK_HEADER([jni.h], [], [AC_MSG_ERROR([cannot find jni.h header with CPPFLA
 AC_CHECK_HEADERS([AvailabilityMacros.h architecture/byte_order.h errno.h netdb.h netinet/in.h netinet/ip.h netinet/ip_icmp.h netinet/in_systm.h stdint.h stdio.h stdlib.h string.h sys/socket.h sys/time.h sys/types.h unistd.h])
 
 # check for socklen_t
-AC_CHECK_SOCKLEN_T
+ONMS_CHECK_SOCKLEN_T
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
