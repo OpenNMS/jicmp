@@ -2,6 +2,14 @@
 %define version @VERSION@
 %define pkgname @PACKAGE@
 
+%define _libdir %_prefix/lib
+%define arch_arg --with-jvm-arch=32
+
+%ifarch x86_64
+%define _libdir %_prefix/lib64
+%define arch_arg --with-jvm-arch=64
+%endif
+
 Name: %{pkgname}
 Version: %{version}
 Release: %{rel}
@@ -18,7 +26,7 @@ FIXME: better description  :)
 %setup -n %{name}-%{version}
 
 %build
-%configure
+%configure %{arch_arg}
 make
 
 %install
