@@ -1,7 +1,7 @@
 /*
  This file is part of the OpenNMS(R) Application.
 
- OpenNMS(R) is Copyright (C) 2002-2003 The OpenNMS Group, Inc.  All rights reserved.
+ OpenNMS(R) is Copyright (C) 2002-2007 The OpenNMS Group, Inc.  All rights reserved.
  OpenNMS(R) is a derivative work, containing both original code, included code and modified
  code that was published under the GNU General Public License. Copyrights for modified
  and included code are below.
@@ -10,6 +10,7 @@
 
  Modifications:
 
+ 2007 Jul 25: Updated to be in a separate library; split out IcmpSocket.h, autoconfized tests
  2004 Oct 27: Handle Darwin 10.2 gracefully.
  2003 Sep 07: More Darwin tweaks.
  2003 Apr 26: Fixes byteswap issues on Solaris x86.
@@ -47,184 +48,20 @@
  Tab Size = 8
 
 */
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#if defined(__SOLARIS__) || defined (__FreeBSD__)
-# include <netinet/in_systm.h>
-#endif
-#if defined(__DARWIN__) 
-#include <stdint.h>
-# include <netinet/in_systm.h>
-# include <AvailabilityMacros.h>
-# ifndef MAC_OS_X_VERSION_10_3
-#  define socklen_t int
-# endif
-#endif
-#include <netinet/in.h>
-#include <netinet/ip.h>
-#include <netinet/ip_icmp.h> 
-#include <netdb.h>
-#include <errno.h>
-#include <sys/time.h>
 
-#if defined(__FreeBSD__)
-#include "byteswap.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
 #endif
 
-#if defined(__DARWIN__)
-#include <architecture/byte_order.h>
-#endif
-
+#include "IcmpSocket.h"
 #include <jni.h>
 
-#if defined(__DARWIN__) || defined(__SOLARIS__) || defined (__FreeBSD__)
-typedef struct ip iphdr_t;
-typedef struct icmp icmphdr_t;
-#define ihl ip_hl
-#else
-typedef struct iphdr iphdr_t;
-typedef struct icmphdr icmphdr_t;
-#endif
 #if 0
 #pragma export on
 #endif
 #include "org_opennms_protocols_icmp_IcmpSocket.h"
 #if 0
 #pragma export reset
-#endif
-
-/**
- * This macro is used to recover the current time
- * in milliseconds.
- */
-#ifndef CURRENTTIMEMILLIS
-#define CURRENTTIMEMILLIS(_dst_) \
-{				\
-	struct timeval tv;	\
-	gettimeofday(&tv,NULL); \
-	_dst_ = (uint64_t)tv.tv_sec * 1000UL + (uint64_t)tv.tv_usec / 1000UL; \
-}
-#endif
-
-/** 
- * This macro is used to recover the current time
- * in microseconds
- */
-#ifndef CURRENTTIMEMICROS
-#define CURRENTTIMEMICROS(_dst_) \
-{				\
-	struct timeval tv;	\
-	gettimeofday(&tv,NULL); \
-	_dst_ = (uint64_t)tv.tv_sec * 1000000UL + (uint64_t)tv.tv_usec; \
-}
-#endif
-
-/**
- * converts microseconds to milliseconds
- */
-#ifndef MICROS_TO_MILLIS
-# define MICROS_TO_MILLIS(_val_) ((_val_) / 1000UL)
-#endif
-
-/**
- * convert milliseconds to microseconds.
- */
-#ifndef MILLIS_TO_MICROS
-# define MILLIS_TO_MICROS(_val_) ((_val_) * 1000UL)
-#endif
-
-/**
- * This constant specifies the length of a 
- * time field in the buffer
- */
-#ifndef TIME_LENGTH
-# define TIME_LENGTH sizeof(uint64_t)
-#endif
-
-/**
- * Specifies the header offset and length
- */
-#ifndef ICMP_HEADER_OFFSET
-# define ICMP_HEADER_OFFSET 0
-# define ICMP_HEADER_LENGTH 8
-#endif
-
-/** 
- * specifies the offset of the sent time.
- */
-#ifndef SENTTIME_OFFSET
-# define SENTTIME_OFFSET (ICMP_HEADER_OFFSET + ICMP_HEADER_LENGTH)
-#endif
-
-/**
- * Sepcifies the offset of the received time.
- */
-#ifndef RECVTIME_OFFSET
-# define RECVTIME_OFFSET (SENTTIME_OFFSET + TIME_LENGTH)
-#endif
-
-/**
- * Specifies the offset of the thread identifer
- */
-#ifndef THREADID_OFFSET
-# define THREADID_OFFSET (RECVTIME_OFFSET + TIME_LENGTH)
-#endif
-
-/**
- * Specifies the offset of the round trip time
- */
-#ifndef RTT_OFFSET
-# define RTT_OFFSET (THREADID_OFFSET + TIME_LENGTH)
-#endif
-
-/**
- * specifies the magic tag and the offset/length of
- * the tag in the header.
- */
-#ifndef OPENNMS_TAG
-# define OPENNMS_TAG "OpenNMS!"
-# define OPENNMS_TAG_LEN 8
-# define OPENNMS_TAG_OFFSET (RTT_OFFSET + TIME_LENGTH)
-#endif
-
-/**
- * Macros for doing byte swapping
- */
-
-#ifndef ntohll
-# if defined(__DARWIN__)
-#  define ntohll(_x_) NXSwapBigLongLongToHost(_x_)
-# elif defined(__SOLARIS__)
-#  if defined(_LITTLE_ENDIAN)
-#   define ntohll(_x_) ((((uint64_t)ntohl((_x_) >> 32)) & 0xffffffff) | (((uint64_t)ntohl(_x_)) << 32))
-#   define htonll(x) ntohll(x)
-#  else
-#   define ntohll(_x_) (_x_)
-#  endif
-# elif defined(__FreeBSD__)
-#  define  ntohll(_x_) __bswap_64(_x_)
-# else
-#  define ntohll(_x_) __bswap_64(_x_)
-# endif
-#endif
-#ifndef htonll
-# if defined(__DARWIN__)
-#  define htonll(_x_) NXSwapHostLongLongToBig(_x_)
-# elif defined(__SOLARIS__)
-#  if defined(_LITTLE_ENDIAN)
-#   define htonll(_x_) ((htonl((_x_ >> 32) & 0xffffffff) | ((uint64_t) (htonl(_x_ & 0xffffffff)) << 32)))
-#  else
-#   define htonll(_x_) (_x_)
-#  endif
-# elif defined(__FreeBSD__)
-#  define  htonll(_x_) __bswap_64(_x_)
-# else
-#  define htonll(_x_) __bswap_64(_x_)
-# endif
 #endif
 
 /**
@@ -581,7 +418,7 @@ JNIEXPORT jobject JNICALL
 Java_org_opennms_protocols_icmp_IcmpSocket_receive (JNIEnv *env, jobject instance)
 {
 	struct sockaddr_in	inAddr;
-	socklen_t		inAddrLen;
+	onms_socklen_t		inAddrLen;
 	int			iRC;
 	void *			inBuf = NULL;
 	iphdr_t *		ipHdr = NULL;
@@ -671,19 +508,19 @@ Java_org_opennms_protocols_icmp_IcmpSocket_receive (JNIEnv *env, jobject instanc
 	 * header from the message. Don't forget to decrement
 	 * the bytes received by the size of the IP header.
 	 *
-	 * NOTE: The ihl field of the IP header is the number
-	 * of 4 byte values in the header. Thus the ihl must
+	 * NOTE: The IP_HL field of the IP header is the number
+	 * of 4 byte values in the header. Thus the IP_HL must
 	 * be multiplied by 4 (or shifted 2 bits).
 	 */
 	ipHdr = (iphdr_t *)inBuf;
-	iRC -= ipHdr->ihl << 2;
+	iRC -= ipHdr->IP_HL << 2;
 	if(iRC <= 0)
 	{
 		jclass ioEx = (*env)->FindClass(env, "java/io/IOException");
 		(*env)->ThrowNew(env, ioEx, "Malformed ICMP datagram received");
 		goto end_recv;
 	}
-	icmpHdr = (icmphdr_t *)((char *)inBuf + (ipHdr->ihl << 2));
+	icmpHdr = (icmphdr_t *)((char *)inBuf + (ipHdr->IP_HL << 2));
 
 	/**
 	 * Check the ICMP header for type equal 0, which is ECHO_REPLY, and

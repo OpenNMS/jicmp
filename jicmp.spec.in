@@ -1,0 +1,38 @@
+%define rel @RELEASE@
+%define version @VERSION@
+%define pkgname @PACKAGE@
+
+Name: %{pkgname}
+Version: %{version}
+Release: %{rel}
+License: GPL
+Group: Applications/Databases
+Summary: Java interface to ICMP (ping)
+Source: %{name}-%{version}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-root
+
+%description
+FIXME: better description  :)
+
+%prep
+%setup -n %{name}-%{version}
+
+%build
+%configure
+make
+
+%install
+%makeinstall
+
+%clean
+if [ "$RPM_BUILD_ROOT" != "/" ]; then
+	rm -rf "$RPM_BUILD_ROOT"
+fi
+
+%files
+%attr(755,root,root) %{_libdir}/libjicmp*
+%attr(644,root,root) %{_datadir}/java/*.jar
+
+%changelog
+* Wed Jul 25 2007 Benjamin Reed <ranger@opennms.org>
+- initial package
