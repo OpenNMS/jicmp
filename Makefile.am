@@ -31,7 +31,7 @@ classdir=classes
 VPATH += $(classdir)
 
 lib_LTLIBRARIES = libjicmp.la
-libjicmp_la_SOURCES = IcmpSocket.c
+libjicmp_la_SOURCES = IcmpSocket.h IcmpSocket.c
 libjicmp_la_LDFLAGS = -module -avoid-version $(JAVA_SHREXT_COMMAND)
 
 MAINTAINERCLEANFILES = aclocal.m4 config.guess config.sub configure depcomp install-sh ltmain.sh Makefile.in missing config.h.in *~ *.tar.gz
