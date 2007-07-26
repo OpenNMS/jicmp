@@ -19,6 +19,8 @@ Summary: Java interface to ICMP (ping)
 Source: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 
+BuildRequires: gcc, jdk >= 1.5.0-1
+
 %description
 FIXME: better description  :)
 
