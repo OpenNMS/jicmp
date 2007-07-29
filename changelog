@@ -1,0 +1,6 @@
+jicmp (1.0-1) unstable; urgency=low
+
+  * Initial release as separately versioned package
+
+ -- Jeff Gehlbach <jeffg@opennms.org>  Sat, 28 Jul 2007 20:32:20 -0400
+

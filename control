@@ -1,0 +1,12 @@
+Source: jicmp
+Section: contrib/net
+Priority: extra
+Maintainer: Jeff Gehlbach <jeffg@opennms.org>
+Build-Depends: cdbs (>= 0.4.23-1.1), autotools-dev, debhelper (>= 5)
+Standards-Version: 3.7.2
+
+Package: jicmp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Java interface to ICMP (ping)
+ A Java native interface (JNI) to ICMP (ping)
