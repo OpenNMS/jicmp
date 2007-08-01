@@ -22,6 +22,7 @@ AC_PROG_CC
 AC_PROG_LN_S
 AC_PROG_LIBTOOL
 AC_PROG_INSTALL
+AC_C_BIGENDIAN
 ONMS_CHECK_JDK([1.4])
 
 AM_RPM_INIT
@@ -38,7 +39,7 @@ PRINT_VAR(JNI_INCLUDES)
 CPPFLAGS="$CPPFLAGS $JNI_INCLUDES"
 AC_CHECK_HEADER([jni.h], [], [AC_MSG_ERROR([cannot find jni.h header with CPPFLAGS="$CPPFLAGS"])])
 
-AC_CHECK_HEADERS([AvailabilityMacros.h architecture/byte_order.h errno.h netdb.h netinet/in.h netinet/ip.h netinet/ip_icmp.h netinet/in_systm.h stdint.h stdio.h stdlib.h string.h sys/socket.h sys/time.h sys/types.h unistd.h])
+AC_CHECK_HEADERS([AvailabilityMacros.h architecture/byte_order.h byteswap.h errno.h netdb.h netinet/in.h netinet/ip.h netinet/ip_icmp.h netinet/in_systm.h stdint.h stdio.h stdlib.h string.h sys/byteorder.h sys/socket.h sys/time.h sys/types.h unistd.h])
 
 # check for socklen_t
 ONMS_CHECK_SOCKLEN_T

@@ -96,6 +96,16 @@
 #include <sys/time.h>
 #endif
 
+#ifdef HAVE_SYS_BYTEORDER_H
+#include <sys/byteorder.h>
+#endif
+
+#ifdef HAVE_BYTESWAP_H
+#include <byteswap.h>
+#else
+#include "byteswap.h"
+#endif
+
 /**
  * Macros for doing byte swapping
  */
@@ -106,25 +116,22 @@
 # define ntohll(_x_) NXSwapBigLongLongToHost(_x_)
 # define htonll(_x_) NXSwapHostLongLongToBig(_x_)
 
-#elif defined(__FreeBSD__)
-# include "byteswap.h"
-# define ntohll(_x_) __bswap_64(_x_)
-# define htonll(_x_) __bswap_64(_x_)
-
-#elif defined(__SOLARIS__)
-# if defined(_LITTLE_ENDIAN)
-#  define ntohll(_x_) ((((uint64_t)ntohl((_x_) >> 32)) & 0xffffffff) | (((uint64_t)ntohl(_x_)) << 32))
-#  define htonll(x) ntohll(x)
-// this was further down in the defines in the original code, but I believe it was impossible to reach it
-// # define htonll(_x_) ((htonl((_x_ >> 32) & 0xffffffff) | ((uint64_t) (htonl(_x_ & 0xffffffff)) << 32)))
-# else
+#elif defined(WORDS_BIGENDIAN)
 #  define ntohll(_x_) (_x_)
 #  define htonll(_x_) (_x_)
-# endif
+
+#elif defined(BSWAP_64)
+#define ntohll(_x_) BSWAP_64(_x_)
+#define htonll(_x_) BSWAP_64(_x_)
+
+#elif defined(__bswap_64)
+#define ntohll(_x_) __bswap_64(_x_)
+#define htonll(_x_) __bswap_64(_x_)
 
 #else
-# define ntohll(_x_) __bswap_64(_x_)
-# define htonll(_x_) __bswap_64(_x_)
+# define ntohll(_x_) bswap_64(_x_)
+# define htonll(_x_) bswap_64(_x_)
+
 #endif
 
 #if defined(HAVE_STRUCT_IP)
