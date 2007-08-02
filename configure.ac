@@ -12,8 +12,6 @@ AC_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE([1.9 foreign])
 AC_ENABLE_STATIC([no])
 
-CFLAGS="-Wall -Werror"
-
 # don't test c++ and f77 in libtool
 m4_ifdef([AC_LIBTOOL_TAGS], [AC_LIBTOOL_TAGS([])])
 
@@ -23,7 +21,9 @@ AC_PROG_LN_S
 AC_PROG_LIBTOOL
 AC_PROG_INSTALL
 AC_C_BIGENDIAN
-ONMS_CHECK_JDK([1.4])
+ONMS_CHECK_JDK([1.5])
+
+CFLAGS="-Wall -Werror -m$JAVA_ARCH"
 
 AM_RPM_INIT
 AM_CONDITIONAL(MAKE_RPMS, test x$make_rpms = xtrue)
@@ -70,5 +70,13 @@ AC_CHECK_TYPE([struct timeval],
 
 gl_BYTESWAP
 
-AC_CONFIG_FILES([Makefile jicmp.spec pom.xml])
+ARCH_PKG="$host_cpu"
+AC_SUBST([ARCH_PKG])
+
+UNAME_R="`uname -r`"
+AC_SUBST([UNAME_R])
+UNAME_S="`uname -s`"
+AC_SUBST([UNAME_S])
+
+AC_CONFIG_FILES([Makefile jicmp.spec pom.xml solaris/pkginfo])
 AC_OUTPUT

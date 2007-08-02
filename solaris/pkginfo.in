@@ -1,0 +1,9 @@
+PKG="NMSjicmp"
+NAME="OpenNMS jicmp JNI library"
+ARCH="@ARCH_PKG@"
+VERSION="@VERSION@,REV=@RELEASE@" @UNAME_S@-@UNAME_R@
+CATEGORY="application"
+VENDOR="OpenNMS"
+EMAIL="visit-www-opennms-org@opennms.org"
+BASEDIR="/"
+CLASSES="none"
