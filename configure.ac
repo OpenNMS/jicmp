@@ -23,7 +23,11 @@ AC_PROG_INSTALL
 AC_C_BIGENDIAN
 ONMS_CHECK_JDK([1.5])
 
-CFLAGS="-Wall -Werror -m$JAVA_ARCH"
+if test "x$GCC" = "xyes"; then
+	CFLAGS="$CFLAGS -Wall -Werror -m$JAVA_ARCH"
+else
+	echo "WARNING: not sure how to make sure you're generating ${JAVA_ARCH}-bit binaries with this compiler"
+fi
 
 AM_RPM_INIT
 AM_CONDITIONAL(MAKE_RPMS, test x$make_rpms = xtrue)
