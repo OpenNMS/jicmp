@@ -35,11 +35,25 @@ PRINT_VAR(JAVAH)
 PRINT_VAR(JAR)
 PRINT_VAR(JNI_INCLUDES)
 
+AC_HEADER_STDC
+
 # check for jni.h
 CPPFLAGS="$CPPFLAGS $JNI_INCLUDES"
 AC_CHECK_HEADER([jni.h], [], [AC_MSG_ERROR([cannot find jni.h header with CPPFLAGS="$CPPFLAGS"])])
 
-AC_CHECK_HEADERS([AvailabilityMacros.h architecture/byte_order.h byteswap.h errno.h netdb.h netinet/in.h netinet/ip.h netinet/ip_icmp.h netinet/in_systm.h stdint.h stdio.h stdlib.h string.h sys/byteorder.h sys/socket.h sys/time.h sys/types.h unistd.h])
+AC_CHECK_HEADERS([AvailabilityMacros.h architecture/byte_order.h byteswap.h errno.h netdb.h sys/socket.h netinet/in.h netinet/ip.h netinet/ip_icmp.h netinet/in_systm.h sys/byteorder.h sys/time.h], [], [], [
+#ifdef HAVE_SYS_SOCKET_H
+# include <sys/socket.h>
+#endif
+
+#ifdef HAVE_NETINET_IN_H
+# include <netinet/in.h>
+#endif
+
+#ifdef HAVE_NETINET_IP_H
+# include <netinet/ip.h>
+#endif
+])
 
 # check for socklen_t
 ONMS_CHECK_SOCKLEN_T
