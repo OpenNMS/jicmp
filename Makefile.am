@@ -65,7 +65,7 @@ deploy:
 if MAKE_RPMS
 rpm: @RPM_TARGET@
 
-EXTRA_DIST = jicmp.spec solaris/pkginfo $(JAVA_FILES)
+EXTRA_DIST = ChangeLog jicmp.spec solaris/pkginfo $(JAVA_FILES)
 
 $(RPM_TARGET): $(DISTFILES)
 	${MAKE} dist

@@ -1,0 +1,8 @@
+1.0.2
+-----
+
+* changed sprintf calls to snprintf to fix potential errno overflow issues
+* fixed build with Sun CC (if you need to build 64-bit binaries, you will
+  need to set -xarch manually in your CFLAGS)
+* fixed detection of some system headers
+* builds with gcj
