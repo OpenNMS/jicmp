@@ -40,9 +40,10 @@ CLEANFILES = org_*.h jicmp.jar
 clean-local:
 	-rm -rf $(classdir)
 
-.java.class:
+# it's a trick, get an axe!
+.java.class: .java
 	-mkdir -p $(classdir)
-	$(JAVAC) -d $(classdir) $<
+	$(JAVAC) -source 1.5 -target 1.5 -d $(classdir) $(JAVA_FILES)
 
 IcmpSocket.c: org_opennms_protocols_icmp_IcmpSocket.h
 
