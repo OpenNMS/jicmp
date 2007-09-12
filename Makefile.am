@@ -43,7 +43,7 @@ clean-local:
 # it's a trick, get an axe!
 .java.class: .java
 	-mkdir -p $(classdir)
-	$(JAVAC) -source 1.5 -target 1.5 -d $(classdir) $(JAVA_FILES)
+	$(JAVAC) $(JAVACFLAGS) -source 1.5 -target 1.5 -d $(classdir) $(JAVA_FILES)
 
 IcmpSocket.c: org_opennms_protocols_icmp_IcmpSocket.h
 
