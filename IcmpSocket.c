@@ -513,14 +513,14 @@ Java_org_opennms_protocols_icmp_IcmpSocket_receive (JNIEnv *env, jobject instanc
 	 * be multiplied by 4 (or shifted 2 bits).
 	 */
 	ipHdr = (iphdr_t *)inBuf;
-	iRC -= ipHdr->IP_HL << 2;
+	iRC -= ipHdr->ONMS_IP_HL << 2;
 	if(iRC <= 0)
 	{
 		jclass ioEx = (*env)->FindClass(env, "java/io/IOException");
 		(*env)->ThrowNew(env, ioEx, "Malformed ICMP datagram received");
 		goto end_recv;
 	}
-	icmpHdr = (icmphdr_t *)((char *)inBuf + (ipHdr->IP_HL << 2));
+	icmpHdr = (icmphdr_t *)((char *)inBuf + (ipHdr->ONMS_IP_HL << 2));
 
 	/**
 	 * Check the ICMP header for type equal 0, which is ECHO_REPLY, and
