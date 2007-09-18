@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.60)
+AC_PREREQ(2.59)
 AC_INIT([jicmp], [1.0.4], [http://www.opennms.org])
 
 RELEASE=1
