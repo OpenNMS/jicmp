@@ -1,3 +1,7 @@
+1.0.4
+-----
+* re-generate tarball, autoconf issues  :(
+
 1.0.3
 -----
 * updated header detection to work on FreeBSD 6.x (in_systm.h needs to be
