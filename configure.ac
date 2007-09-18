@@ -2,14 +2,14 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.60)
-AC_INIT([jicmp], [1.0.3], [http://www.opennms.org])
+AC_INIT([jicmp], [1.0.4], [http://www.opennms.org])
 
 RELEASE=1
 AC_SUBST([RELEASE])
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE([1.10 foreign])
+AM_INIT_AUTOMAKE([1.9 foreign])
 AC_ENABLE_STATIC([no])
 
 # don't test c++ and f77 in libtool
