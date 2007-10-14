@@ -23,30 +23,8 @@ AC_PROG_INSTALL
 AC_C_BIGENDIAN
 ONMS_CHECK_JDK([1.5])
 ONMS_CHECK_SUNCC
-
-if test "x$GCC" = "xyes"; then
-	CFLAGS="$CFLAGS -Wall -Werror -m$JAVA_ARCH"
-elif test "x$HAS_SUNCC" = "xyes"; then
-        case "${JAVA_ARCH}" in
-		32)
-			SUNCC_ARCH_FLAGS="-xarch=generic"
-		;;
-
-		64)
-			SUNCC_ARCH_FLAGS="-xarch=generic64"
-		;;
-
-		*)
-			SUNCC_ARCH_FLAGS=""
-			echo "WARNING: not sure how to tell the Sun CC compiler to generate ${JAVA_ARCH}-bit binaries with this compiler"
-		;;
-        esac
-
-	CFLAGS="$CFLAGS -errwarn=%all $SUNCC_ARCH_FLAGS"
-
-else
-	echo "WARNING: not sure how to make sure you're generating ${JAVA_ARCH}-bit binaries with this compiler: $CC"
-fi
+ONMS_SET_CC_ARCH_CFLAGS
+ONMS_SET_CC_WARNING_CFLAGS
 
 AM_RPM_INIT
 AM_CONDITIONAL(MAKE_RPMS, test x$make_rpms = xtrue)
