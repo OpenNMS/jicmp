@@ -56,6 +56,14 @@
 #include "IcmpSocket.h"
 #include <jni.h>
 
+#ifdef __WIN32__
+
+#ifndef __MINGW32__
+#error "We've only tried this with MingW32.  If you want to port to something else, please implement it.  ;)"
+#endif
+
+#endif
+
 #if 0
 #pragma export on
 #endif

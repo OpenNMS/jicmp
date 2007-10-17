@@ -88,6 +88,18 @@
 #include "byteswap.h"
 #endif
 
+#ifdef HAVE_WINSOCK2_H
+#include <winsock2.h>
+#endif
+
+#ifdef HAVE_WS2TCPIP_H
+#include <ws2tcpip.h>
+#endif
+
+#ifdef __WIN32__
+#include "win32/icmp.h"
+#endif
+
 /**
  * Macros for doing byte swapping
  */

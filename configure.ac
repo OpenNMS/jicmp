@@ -39,26 +39,12 @@ PRINT_VAR(JNI_INCLUDES)
 AC_HEADER_STDC
 
 # check for jni.h
-CPPFLAGS="$CPPFLAGS $JNI_INCLUDES"
+CPPFLAGS="$CPPFLAGS $JNI_INCLUDES -I."
 AC_CHECK_HEADER([jni.h], [], [AC_MSG_ERROR([cannot find jni.h header with CPPFLAGS="$CPPFLAGS"])])
 
-AC_CHECK_HEADERS([AvailabilityMacros.h architecture/byte_order.h byteswap.h errno.h netdb.h sys/socket.h netinet/in.h netinet/in_systm.h netinet/ip.h netinet/ip_icmp.h sys/byteorder.h sys/time.h], [], [], [
+AC_CHECK_HEADERS([sys/types.h AvailabilityMacros.h architecture/byte_order.h byteswap.h errno.h netdb.h sys/byteorder.h sys/time.h], [], [], [
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
-
-#ifdef HAVE_SYS_SOCKET_H
-# include <sys/socket.h>
-#endif
-
-#ifdef HAVE_NETINET_IN_H
-# include <netinet/in.h>
-#endif
-
-#ifdef HAVE_NETINET_IN_SYSTM_H
-# include <netinet/in_systm.h>
-#endif
-
-#ifdef HAVE_NETINET_IP_H
-# include <netinet/ip.h>
 #endif
 ])
 
@@ -73,8 +59,16 @@ AC_FUNC_MALLOC
 
 ONMS_CHECK_IP_STRUCT([ip])
 ONMS_CHECK_IP_STRUCT([iphdr])
-ONMS_CHECK_IP_STRUCT([icmp],    [#include <netinet/ip_icmp.h>])
-ONMS_CHECK_IP_STRUCT([icmphdr], [#include <netinet/ip_icmp.h] )
+ONMS_CHECK_IP_STRUCT([icmp],    [
+#ifdef HAVE_NETINET_IP_ICMP_H
+# include <netinet/ip_icmp.h>
+#endif
+])
+ONMS_CHECK_IP_STRUCT([icmphdr], [
+#ifdef HAVE_NETINET_IP_ICMP_H
+# include <netinet/ip_icmp.h>
+#endif
+])
 
 ONMS_CHECK_IP_STRUCT_ENTRY([HL], [ip_hl])
 ONMS_CHECK_IP_STRUCT_ENTRY([HL], [ihl])
@@ -86,8 +80,15 @@ ONMS_CHECK_ICMP_STRUCT_ENTRY([CHECKSUM], [checksum])
 AC_CHECK_TYPE([struct timeval],
 	[],
 	[ AC_MSG_ERROR([cannot find struct timeval]) ],
-	[ #include <sys/time.h> ]
-)
+	[
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+
+#ifdef HAVE_WINSOCK2_H
+#include <winsock2.h>
+#endif
+])
 
 gl_BYTESWAP
 

@@ -107,6 +107,8 @@ struct icmp {
 #define ICMP_ECHOREPLY		0		/* echo reply */
 #define ICMP_ECHO		8		/* echo service */
 
+#ifdef USE_IPV6
+
 /*
  * ICMPv6 structures & constants
  */
@@ -144,5 +146,6 @@ struct ip6_pseudo_hdr  /* for calculate the ICMPv6 checksum */
 #define IPPROTO_ICMPV6		58
 #define IPV6_UNICAST_HOPS       4  /* Set/get IP unicast hop limit */
 
+#endif // USE_IPV6
 
 #endif
