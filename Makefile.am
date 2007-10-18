@@ -32,7 +32,7 @@ VPATH += $(classdir)
 
 lib_LTLIBRARIES = libjicmp.la
 libjicmp_la_SOURCES = byteswap.h IcmpSocket.h IcmpSocket.c
-libjicmp_la_LDFLAGS = -module -avoid-version $(JAVA_SHREXT_COMMAND)
+libjicmp_la_LDFLAGS = -module -avoid-version -no-undefined $(JAVA_SHREXT_COMMAND) $(WIN32_LIBS)
 
 MAINTAINERCLEANFILES = aclocal.m4 config.guess config.sub configure depcomp install-sh ltmain.sh Makefile.in missing config.h.in *~ *.tar.gz
 CLEANFILES = org_*.h jicmp.jar
@@ -65,7 +65,7 @@ deploy:
 if MAKE_RPMS
 rpm: @RPM_TARGET@
 
-EXTRA_DIST = ChangeLog jicmp.spec solaris/pkginfo $(JAVA_FILES)
+EXTRA_DIST = ChangeLog jicmp.spec solaris/pkginfo $(JAVA_FILES) win32/icmp.h
 
 $(RPM_TARGET): $(DISTFILES)
 	${MAKE} dist
