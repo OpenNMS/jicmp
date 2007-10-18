@@ -98,6 +98,7 @@
 
 #ifdef __WIN32__
 #include "win32/icmp.h"
+typedef u_int in_addr_t;
 #endif
 
 /**
