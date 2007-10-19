@@ -30,9 +30,19 @@ JAVA_FILES = org/opennms/protocols/icmp/AddressMaskReply.java \
 classdir=classes
 VPATH += $(classdir)
 
+JICMP_SOURCES = byteswap.h IcmpSocket.h IcmpSocket.c
+JICMP_LDFLAGS = -module -avoid-version -no-undefined $(JAVA_SHREXT_COMMAND)
+
+if WIN32
+lib_LTLIBRARIES = jicmp.la
+jicmp_la_SOURCES = $(JICMP_SOURCES)
+jicmp_la_LDFLAGS = $(JICMP_LDFLAGS)
+jicmp_la_LIBADD = -lws2_32
+else
 lib_LTLIBRARIES = libjicmp.la
-libjicmp_la_SOURCES = byteswap.h IcmpSocket.h IcmpSocket.c
-libjicmp_la_LDFLAGS = -module -avoid-version -no-undefined $(JAVA_SHREXT_COMMAND) $(WIN32_LIBS)
+libjicmp_la_SOURCES = $(JICMP_SOURCES)
+libjicmp_la_LDFLAGS = $(JICMP_LDFLAGS)
+endif
 
 MAINTAINERCLEANFILES = aclocal.m4 config.guess config.sub configure depcomp install-sh ltmain.sh Makefile.in missing config.h.in *~ *.tar.gz
 CLEANFILES = org_*.h jicmp.jar

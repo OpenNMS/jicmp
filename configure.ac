@@ -100,13 +100,14 @@ AC_SUBST([UNAME_R])
 UNAME_S="`uname -s`"
 AC_SUBST([UNAME_S])
 
+on_win32=no
 case $host_os in
 	mingw32*)
-		WIN32_LIBS="-lws2_32"
+		on_win32=yes
 		;;
 esac
 
-AC_SUBST([WIN32_LIBS])
+AM_CONDITIONAL([WIN32], [test x$on_win32 = xyes])
 
 AC_CONFIG_FILES([Makefile jicmp.spec pom.xml solaris/pkginfo])
 AC_OUTPUT
