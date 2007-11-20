@@ -47,20 +47,23 @@ endif
 MAINTAINERCLEANFILES = aclocal.m4 config.guess config.sub configure depcomp install-sh ltmain.sh Makefile.in missing config.h.in *~ *.tar.gz
 CLEANFILES = org_*.h jicmp.jar
 
-clean-local:
-	-rm -rf $(classdir)
+.PHONY: clean-local
 
-# it's a trick, get an axe!
-.java.class: .java
+clean-local:
+	-rm -rf $(classdir) java.built
+
+java-classes: java.built
+
+java.built: $(JAVA_FILES)
 	-mkdir -p $(classdir)
-	$(JAVAC) $(JAVACFLAGS) -source 1.5 -target 1.5 -d $(classdir) $(JAVA_FILES)
+	$(JAVAC) $(JAVACFLAGS) -source 1.5 -target 1.5 -d $(classdir) $(JAVA_FILES) && touch java.built
 
 IcmpSocket.c: org_opennms_protocols_icmp_IcmpSocket.h
 
-org_opennms_protocols_icmp_IcmpSocket.h: org/opennms/protocols/icmp/IcmpSocket.class
+org_opennms_protocols_icmp_IcmpSocket.h: java.built
 	$(JAVAH) -classpath $(classdir) org.opennms.protocols.icmp.IcmpSocket
 
-jicmp.jar: $(CLASS_FILES)
+jicmp.jar: java.built
 	cd $(classdir) && \
 	$(JAR) cvf ../$@ *
 
