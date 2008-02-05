@@ -18,6 +18,7 @@ check_include_files("AvailabilityMacros.h"                                      
 check_include_files("byteswap.h"                                                                 HAVE_BYTESWAP_H)
 check_include_files("dlfcn.h"                                                                    HAVE_DLFCN_H)
 check_include_files("errno.h"                                                                    HAVE_ERRNO_H)
+check_include_files("intsafe.h"                                                                  HAVE_INTSAFE_H)
 check_include_files("inttypes.h"                                                                 HAVE_INTTYPES_H)
 check_include_files("malloc.h"                                                                   HAVE_MALLOC_H)
 check_include_files("memory.h"                                                                   HAVE_MEMORY_H)
@@ -37,6 +38,7 @@ check_include_files("sys/time.h"                                                
 check_include_files("sys/types.h"                                                                HAVE_SYS_TYPES_H)
 check_include_files("unistd.h"                                                                   HAVE_UNISTD_H)
 check_include_files("winsock2.h"                                                                 HAVE_WINSOCK2_H)
+check_include_files("ws2def.h"                                                                   HAVE_WS2DEF_H)
 check_include_files("ws2tcpip.h"                                                                 HAVE_WS2TCPIP_H)
 
 if(WIN32)
@@ -106,4 +108,4 @@ include_directories(${JAVA_INCLUDE_PATH})
 
 add_library(jicmp MODULE IcmpSocket.c ${CMAKE_CURRENT_BINARY_DIR}/org_opennms_protocols_icmp_IcmpSocket.h)
 
-add_custom_target(jicmp.jar jar -cvf jicmp.jar org DEPENDS ${JAVA_CLASS_FILES} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+add_custom_target(jicmp.jar ${JAVA_ARCHIVE} -cvf jicmp.jar org DEPENDS ${JAVA_CLASS_FILES} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

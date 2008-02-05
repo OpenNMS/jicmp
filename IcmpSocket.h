@@ -107,16 +107,22 @@
 #endif
 
 #ifdef HAVE_WINSOCK2_H
-#include <winsock2.h>
+
+#ifdef HAVE_WS2DEF_H
+#include <ws2def.h>
 #endif
+
+#include <winsock2.h>
 
 #ifdef HAVE_WS2TCPIP_H
 #include <ws2tcpip.h>
 #endif
 
-#ifdef __WIN32__
 #include "win32/icmp.h"
 typedef u_int in_addr_t;
+
+#define snprintf _snprintf
+#pragma warning(disable: 4996)
 #endif
 
 /**
