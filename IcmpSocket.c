@@ -113,7 +113,7 @@ unsigned short checksum(register unsigned short *p, register int sz)
 		sum = (sum >> 16) + (sum & 0xffffUL);
 
 	sum = ~sum & 0xffffUL; 
-	return sum;
+	return (unsigned short)sum;
 }
 
 /**

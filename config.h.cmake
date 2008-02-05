@@ -79,7 +79,14 @@
 /* Define to 1 if you have the <ws2tcpip.h> header file. */
 #cmakedefine HAVE_WS2TCPIP_H
 
-/** BEHAVIOR CHECKS **/
+/** BEHAVIOR/TYPE CHECKS **/
+
+/* in_addr_t needed for IP headers */
+#cmakedefine HAVE_IN_ADDR_T
+
+#ifndef HAVE_IN_ADDR_T
+typedef u_int32_t in_addr_t
+#endif
 
 /* struct icmp needed for IP headers */
 #cmakedefine HAVE_STRUCT_ICMP

@@ -45,6 +45,7 @@ else(WIN32)
 	set(CMAKE_EXTRA_INCLUDE_FILES sys/types.h netinet/in.h netinet/in_systm.h netinet/ip.h netinet/ip_icmp.h)
 endif(WIN32)
 
+check_type_size("in_addr_t"      IN_ADDR_T)
 check_type_size("struct icmp"    STRUCT_ICMP)
 check_type_size("struct icmphdr" STRUCT_ICMPHDR)
 check_type_size("struct ip"      STRUCT_IP)
