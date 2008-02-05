@@ -11,6 +11,8 @@ find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
 get_filename_component(JAVABIN_PATH ${JAVA_COMPILE} PATH)
 
+include_directories(${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH}/win32)
+
 check_include_files("architecture/byte_order.h"                                                  HAVE_ARCHITECTURE_BYTE_ORDER_H)
 check_include_files("AvailabilityMacros.h"                                                       HAVE_AVAILABILITYMACROS_H)
 check_include_files("byteswap.h"                                                                 HAVE_BYTESWAP_H)
