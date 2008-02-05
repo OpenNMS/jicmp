@@ -120,7 +120,9 @@
 
 #include "win32/icmp.h"
 typedef u_int in_addr_t;
+typedef u_int64 uint64_t;
 
+#define close closesocket
 #define snprintf _snprintf
 #pragma warning(disable: 4996)
 #endif

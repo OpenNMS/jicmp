@@ -55,11 +55,18 @@ Tab Size = 8
 #include <jni.h>
 
 #ifdef __WIN32__
+int gettimeofday (struct timeval *tv, void* tz)
+{
+	union {
+		ULONG64 ns100; /*time since 1 Jan 1601 in 100ns units */
+		FILETIME ft;
+	} now;
 
-#ifndef __MINGW32__
-#error "We've only tried this with MingW32.  If you want to port to something else, please implement it.  ;)"
-#endif
-
+	GetSystemTimeAsFileTime (&now.ft);
+	tv->tv_usec = (long) ((now.ns100 / 10LL) % 1000000LL);
+	tv->tv_sec = (long) ((now.ns100 - 116444736000000000LL) / 10000000LL);
+	return (0);
+}
 #endif
 
 #if 0
@@ -383,6 +390,7 @@ JNIEXPORT void JNICALL
 Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject instance)
 {
 	struct protoent *proto;
+	int icmp_fd;
 
 	proto = getprotobyname("icmp");
 	if (proto == (struct protoent *) NULL) {
@@ -396,7 +404,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 		return;
 	}
 
-	int icmp_fd = socket(AF_INET, SOCK_RAW, proto->p_proto);
+	icmp_fd = socket(AF_INET, SOCK_RAW, proto->p_proto);
 	if(icmp_fd < 0)
 	{
 		char	errBuf[128];	/* for exceptions */

@@ -43,6 +43,7 @@ check_include_files("ws2tcpip.h"                                                
 
 if(WIN32)
 	set(CMAKE_EXTRA_INCLUDE_FILES sys/types.h winsock2.h ws2tcpip.h win32/icmp.h)
+	add_definitions(-D__WIN32__)
 else(WIN32)
 	set(CMAKE_EXTRA_INCLUDE_FILES sys/types.h netinet/in.h netinet/in_systm.h netinet/ip.h netinet/ip_icmp.h)
 endif(WIN32)
@@ -107,5 +108,8 @@ configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 include_directories(${JAVA_INCLUDE_PATH})
 
 add_library(jicmp MODULE IcmpSocket.c ${CMAKE_CURRENT_BINARY_DIR}/org_opennms_protocols_icmp_IcmpSocket.h)
+if(WIN32)
+	target_link_libraries(jicmp ws2_32)
+endif(WIN32)
 
 add_custom_target(jicmp.jar ${JAVA_ARCHIVE} -cvf jicmp.jar org DEPENDS ${JAVA_CLASS_FILES} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
