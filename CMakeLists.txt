@@ -24,8 +24,8 @@ check_include_files("malloc.h"                                                  
 check_include_files("memory.h"                                                                   HAVE_MEMORY_H)
 check_include_files("netdb.h"                                                                    HAVE_NETDB_H)
 check_include_files("sys/types.h;netinet/in.h"                                                   HAVE_NETINET_IN_H)
-check_include_files("netinet/in_systm.h"                                                         HAVE_NETINET_IN_SYSTM_H)
-check_include_files("netinet/ip.h"                                                               HAVE_NETINET_IP_H)
+check_include_files("sys/types.h;netinet/in_systm.h"                                             HAVE_NETINET_IN_SYSTM_H)
+check_include_files("sys/types.h;netinet/in.h;netinet/ip.h"                                      HAVE_NETINET_IP_H)
 check_include_files("sys/types.h;netinet/in.h;netinet/in_systm.h;netinet/ip.h;netinet/ip_icmp.h" HAVE_NETINET_IP_ICMP_H)
 check_include_files("stdint.h"                                                                   HAVE_STDINT_H)
 check_include_files("stdlib.h"                                                                   HAVE_STDLIB_H)
@@ -100,7 +100,7 @@ foreach(FILE ${JAVA_SOURCE_FILES})
 	list(APPEND JAVA_CLASS_FILES ${CMAKE_CURRENT_BINARY_DIR}/${CLASSFILE})
 endforeach(FILE ${JAVA_SOURCE_FILES})
 
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/org/opennms/protocols/icmp/IcmpSocket.class COMMAND ${JAVABIN_PATH}/javac -d ${CMAKE_CURRENT_BINARY_DIR} -classpath ${CMAKE_CURRENT_BINARY_DIR} ${JAVA_SOURCE_FILES} DEPENDS ${JAVA_SOURCE_FILES} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+add_custom_command(OUTPUT ${JAVA_CLASS_FILES} COMMAND ${JAVABIN_PATH}/javac -d ${CMAKE_CURRENT_BINARY_DIR} -classpath ${CMAKE_CURRENT_BINARY_DIR} ${JAVA_SOURCE_FILES} DEPENDS ${JAVA_SOURCE_FILES} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/org_opennms_protocols_icmp_IcmpSocket.h COMMAND ${JAVABIN_PATH}/javah -d ${CMAKE_CURRENT_BINARY_DIR} -classpath ${CMAKE_CURRENT_BINARY_DIR} org.opennms.protocols.icmp.IcmpSocket DEPENDS ${JAVA_CLASS_FILES} jicmp.jar WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
