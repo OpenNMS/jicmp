@@ -38,6 +38,9 @@ check_include_files("winsock2.h"                                                
 check_include_files("ws2tcpip.h"                                                                 HAVE_WS2TCPIP_H)
 
 set(CMAKE_EXTRA_INCLUDE_FILES sys/types.h netinet/in.h netinet/in_systm.h netinet/ip.h netinet/ip_icmp.h)
+if(WIN32)
+	set(CMAKE_EXTRA_INCLUDE_FILES ${CMAKE_EXTRA_INCLUDE_FILES} win32/icmp.h)
+endif(WIN32)
 
 check_type_size("struct icmp"    STRUCT_ICMP)
 check_type_size("struct icmphdr" STRUCT_ICMPHDR)
