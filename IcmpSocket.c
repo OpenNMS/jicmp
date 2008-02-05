@@ -389,8 +389,14 @@ end_inet:
 JNIEXPORT void JNICALL
 Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject instance)
 {
-	struct protoent *proto;
 	int icmp_fd;
+
+#ifdef __WIN32__
+	WSADATA info;
+	WSAStartup(MAKEWORD(1,1), &info);
+	icmp_fd = socket(AF_INET, SOCK_RAW, 1);
+#else
+	struct protoent *proto;
 
 	proto = getprotobyname("icmp");
 	if (proto == (struct protoent *) NULL) {
@@ -405,6 +411,8 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 	}
 
 	icmp_fd = socket(AF_INET, SOCK_RAW, proto->p_proto);
+#endif
+
 	if(icmp_fd < 0)
 	{
 		char	errBuf[128];	/* for exceptions */
