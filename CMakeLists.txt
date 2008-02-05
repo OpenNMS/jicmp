@@ -108,6 +108,11 @@ configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 include_directories(${JAVA_INCLUDE_PATH})
 
 add_library(jicmp MODULE IcmpSocket.c ${CMAKE_CURRENT_BINARY_DIR}/org_opennms_protocols_icmp_IcmpSocket.h)
+
+if(APPLE)
+	set_target_properties(jicmp PROPERTIES SUFFIX .jnilib)
+endif(APPLE)
+
 if(WIN32)
 	target_link_libraries(jicmp ws2_32)
 endif(WIN32)
