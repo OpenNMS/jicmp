@@ -50,7 +50,7 @@ CLEANFILES = org_*.h jicmp.jar
 .PHONY: clean-local
 
 clean-local:
-	-rm -rf $(classdir) java.built
+	-rm -rf $(classdir) java.built *.tar.gz
 
 java-classes: java.built
 

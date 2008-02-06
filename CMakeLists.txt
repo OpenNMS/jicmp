@@ -11,7 +11,7 @@ find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
 get_filename_component(JAVABIN_PATH ${JAVA_COMPILE} PATH)
 
-include_directories(${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH}/win32)
+include_directories(${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH}/win32 ${JAVA_INCLUDE_PATH}/linux)
 
 check_include_files("architecture/byte_order.h"                                                  HAVE_ARCHITECTURE_BYTE_ORDER_H)
 check_include_files("AvailabilityMacros.h"                                                       HAVE_AVAILABILITYMACROS_H)
@@ -61,22 +61,14 @@ if(HAVE_STRUCT_IP)
 	set(TYPE     "icmp_type")
 	set(CHECKSUM "icmp_cksum")
 	set(HAVE_STRUCT_IP_BOOL 1)
+else(HAVE_STRUCT_IP)
+	if(HAVE_STRUCT_IPHDR)
+		set(HL       "ihl")
+		set(TYPE     "type")
+		set(CHECKSUM "checksum")
+		set(HAVE_STRUCT_IPHDR_BOOL 1)
+	endif(HAVE_STRUCT_IPHDR)
 endif(HAVE_STRUCT_IP)
-
-if(HAVE_STRUCT_IPHDR)
-	set(HL       "ihl")
-	set(TYPE     "type")
-	set(CHECKSUM "checksum")
-	set(HAVE_STRUCT_IPHDR_BOOL 1)
-endif(HAVE_STRUCT_IPHDR)
-
-if(HAVE_STRUCT_ICMP)
-	set(HAVE_STRUCT_ICMP_BOOL 1)
-endif(HAVE_STRUCT_ICMP)
-
-if(HAVE_STRUCT_ICMPHDR)
-	set(HAVE_STRUCT_ICMPHDR_BOOL 1)
-endif(HAVE_STRUCT_ICMPHDR)
 
 test_big_endian(WORDS_BIGENDIAN)
 
