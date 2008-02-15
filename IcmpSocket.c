@@ -10,6 +10,7 @@ OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
 
 Modifications:
 
+2008 Feb 05: Cleaned up win32 building, also merged patch from Alfred Reibenschuh <alfred.reibenschuh@it-austria.com>
 2007 Jul 25: Updated to be in a separate library; split out IcmpSocket.h, autoconfized tests
 2004 Oct 27: Handle Darwin 10.2 gracefully.
 2003 Sep 07: More Darwin tweaks.

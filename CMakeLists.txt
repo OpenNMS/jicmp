@@ -2,6 +2,16 @@ project(jimcp)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I${CMAKE_CURRENT_SOURCE_DIR} -I${CMAKE_CURRENT_BINARY_DIR}")
 
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Java ICMP Library")
+set(CPACK_PACKAGE_VENDOR "The OpenNMS Group, Inc.")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "0")
+set(CPACK_PACKAGE_VERSION_PATCH "7")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "JICMP ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "jicmp-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+
 include(CheckIncludeFiles)
 include(CheckTypeSize)
 include(CMakeJavaInformation)
@@ -10,8 +20,9 @@ include(TestBigEndian)
 find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
 get_filename_component(JAVABIN_PATH ${JAVA_COMPILE} PATH)
+include(CPack)
 
-include_directories(${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH}/win32 ${JAVA_INCLUDE_PATH}/linux)
+include_directories("${JAVA_INCLUDE_PATH}" "${JAVA_INCLUDE_PATH}/win32" "${JAVA_INCLUDE_PATH}/linux")
 
 check_include_files("architecture/byte_order.h"                                                  HAVE_ARCHITECTURE_BYTE_ORDER_H)
 check_include_files("AvailabilityMacros.h"                                                       HAVE_AVAILABILITYMACROS_H)
@@ -89,17 +100,17 @@ set(JAVA_SOURCE_FILES
 
 foreach(FILE ${JAVA_SOURCE_FILES})
 	string(REGEX REPLACE ".java$" ".class" CLASSFILE ${FILE})
-	list(APPEND JAVA_CLASS_FILES ${CMAKE_CURRENT_BINARY_DIR}/${CLASSFILE})
+	list(APPEND JAVA_CLASS_FILES "${CMAKE_CURRENT_BINARY_DIR}/${CLASSFILE}")
 endforeach(FILE ${JAVA_SOURCE_FILES})
 
-add_custom_command(OUTPUT ${JAVA_CLASS_FILES} COMMAND ${JAVABIN_PATH}/javac -d ${CMAKE_CURRENT_BINARY_DIR} -classpath ${CMAKE_CURRENT_BINARY_DIR} ${JAVA_SOURCE_FILES} DEPENDS ${JAVA_SOURCE_FILES} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+add_custom_command(OUTPUT ${JAVA_CLASS_FILES} COMMAND "${JAVABIN_PATH}/javac" -d ${CMAKE_CURRENT_BINARY_DIR} -classpath ${CMAKE_CURRENT_BINARY_DIR} ${JAVA_SOURCE_FILES} DEPENDS ${JAVA_SOURCE_FILES} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/org_opennms_protocols_icmp_IcmpSocket.h COMMAND ${JAVABIN_PATH}/javah -d ${CMAKE_CURRENT_BINARY_DIR} -classpath ${CMAKE_CURRENT_BINARY_DIR} org.opennms.protocols.icmp.IcmpSocket DEPENDS ${JAVA_CLASS_FILES} jicmp.jar WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/org_opennms_protocols_icmp_IcmpSocket.h" COMMAND "${JAVABIN_PATH}/javah" -d ${CMAKE_CURRENT_BINARY_DIR} -classpath ${CMAKE_CURRENT_BINARY_DIR} org.opennms.protocols.icmp.IcmpSocket DEPENDS ${JAVA_CLASS_FILES} "${CMAKE_CURRENT_BINARY_DIR}/jicmp.jar" WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
-configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+configure_file(config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/config.h")
 include_directories(${JAVA_INCLUDE_PATH})
 
-add_library(jicmp MODULE IcmpSocket.c ${CMAKE_CURRENT_BINARY_DIR}/org_opennms_protocols_icmp_IcmpSocket.h)
+add_library(jicmp MODULE IcmpSocket.c "${CMAKE_CURRENT_BINARY_DIR}/org_opennms_protocols_icmp_IcmpSocket.h")
 
 if(APPLE)
 	set_target_properties(jicmp PROPERTIES SUFFIX .jnilib)
@@ -109,4 +120,7 @@ if(WIN32)
 	target_link_libraries(jicmp ws2_32)
 endif(WIN32)
 
-add_custom_target(jicmp.jar ${JAVA_ARCHIVE} -cvf jicmp.jar org DEPENDS ${JAVA_CLASS_FILES} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/jicmp.jar" COMMAND ${JAVA_ARCHIVE} -cvf jicmp.jar org DEPENDS ${JAVA_CLASS_FILES} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+
+install(TARGETS jicmp DESTINATION lib)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/jicmp.jar" DESTINATION share/java RENAME "jicmp-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}.jar")
