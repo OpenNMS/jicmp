@@ -3,6 +3,7 @@
 * implement CMake for easier portability
 
 1.0.6
+-----
 * fix build-system (missing check for ip.h)
 * fix build on Mac OS X
 
