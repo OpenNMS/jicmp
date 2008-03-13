@@ -42,7 +42,7 @@ AC_HEADER_STDC
 CPPFLAGS="$CPPFLAGS $JNI_INCLUDES -I."
 AC_CHECK_HEADER([jni.h], [], [AC_MSG_ERROR([cannot find jni.h header with CPPFLAGS="$CPPFLAGS"])])
 
-AC_CHECK_HEADERS([sys/types.h AvailabilityMacros.h architecture/byte_order.h byteswap.h errno.h netdb.h sys/byteorder.h sys/time.h], [], [], [
+AC_CHECK_HEADERS([sys/types.h AvailabilityMacros.h architecture/byte_order.h byteswap.h errno.h malloc.h netdb.h stdlib.h sys/byteorder.h sys/time.h], [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -53,9 +53,6 @@ ONMS_CHECK_SOCKLEN_T
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
-
-# Checks for library functions.
-AC_FUNC_MALLOC
 
 ONMS_CHECK_IP_STRUCT([ip])
 ONMS_CHECK_IP_STRUCT([iphdr])
