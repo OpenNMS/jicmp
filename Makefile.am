@@ -78,7 +78,7 @@ deploy:
 if MAKE_RPMS
 rpm: @RPM_TARGET@
 
-EXTRA_DIST = ChangeLog jicmp.spec solaris/pkginfo $(JAVA_FILES) win32/icmp.h
+EXTRA_DIST = ChangeLog jicmp.spec solaris/pkginfo $(JAVA_FILES) win32/icmp.h CMakeLists.txt config.h.cmake
 
 $(RPM_TARGET): $(DISTFILES)
 	${MAKE} dist
