@@ -6,7 +6,7 @@ include /usr/share/cdbs/1/rules/tarball.mk
 include /usr/share/cdbs/1/class/autotools.mk
 include /usr/share/cdbs/1/rules/debhelper.mk
 
-JAVA_HOME=$(shell debian/getjava JAVA_HOME)
+JAVA_HOME=$(shell debian/getjava)
 
 DEB_CONFIGURE_EXTRA_FLAGS := --libdir=/usr/lib/jni --with-java=$(JAVA_HOME)
 
