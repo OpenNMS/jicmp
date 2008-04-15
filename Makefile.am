@@ -75,10 +75,12 @@ deploy:
 
 .PHONY: deploy rpm
 
+EXTRA_DIST = ChangeLog solaris/pkginfo $(JAVA_FILES) win32/icmp.h CMakeLists.txt config.h.cmake
+
 if MAKE_RPMS
 rpm: @RPM_TARGET@
 
-EXTRA_DIST = ChangeLog jicmp.spec solaris/pkginfo $(JAVA_FILES) win32/icmp.h CMakeLists.txt config.h.cmake
+EXTRA_DIST += jicmp.spec
 
 $(RPM_TARGET): $(DISTFILES)
 	${MAKE} dist
