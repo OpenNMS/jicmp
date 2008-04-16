@@ -8,5 +8,7 @@ Standards-Version: 3.7.2
 Package: jicmp
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libicmp-jni
+Replaces: libicmp-jni
 Description: Java interface to ICMP (ping)
  A Java native interface (JNI) to ICMP (ping)
