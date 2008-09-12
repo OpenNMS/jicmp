@@ -14,7 +14,6 @@
           <repositoryId>opennms-repo</repositoryId>
           <url>scpexe://repo.opennms.org/var/www/sites/opennms.org/site/repo/maven2</url>
           <file>jicmp.jar</file>
-          <pomFile>pom.xml</pomFile>
         </configuration>
       </plugin>
     </plugins>
