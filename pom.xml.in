@@ -7,13 +7,37 @@
   <packaging>jar</packaging>
   <name>OpenNMS ICMP API</name>
   <build>
+    <sourceDirectory>${basedir}</sourceDirectory>
     <plugins>
       <plugin>
-        <artifactId>maven-deploy-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <repositoryId>opennms-repo</repositoryId>
-          <url>scpexe://repo.opennms.org/var/www/sites/opennms.org/site/repo/maven2</url>
-          <file>jicmp.jar</file>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <aggregate>true</aggregate>
+          <use>false</use>
+          <links>
+            <link>http://java.sun.com/j2ee/1.4/docs/api</link>
+            <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+          </links>
         </configuration>
       </plugin>
     </plugins>
