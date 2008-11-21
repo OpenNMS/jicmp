@@ -128,9 +128,14 @@ typedef u_int in_addr_t;
 typedef u_int64 uint64_t;
 #endif
 
+#ifdef __MINGW32__
+typedef u_int in_addr_t;
+#else
+/* Visual Studio */
 #define close closesocket
 #define snprintf _snprintf
 #pragma warning(disable: 4996)
+#endif
 #endif
 
 /**
