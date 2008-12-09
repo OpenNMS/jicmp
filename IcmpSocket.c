@@ -390,12 +390,42 @@ end_inet:
 JNIEXPORT void JNICALL
 Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject instance)
 {
-	int icmp_fd;
-
+	int icmp_fd = -1;
 #ifdef __WIN32__
+	int result;
 	WSADATA info;
-	WSAStartup(MAKEWORD(1,1), &info);
-	icmp_fd = socket(AF_INET, SOCK_RAW, 1);
+
+	result = WSAStartup(MAKEWORD(2,2), &info);
+	if (result != 0)
+	{
+		char errBuf[128];
+		jclass ioException = (*env)->FindClass(env, "java/net/IOException");
+		if (ioException != NULL)
+		{
+			sprintf(errBuf, "WSAStartup failed: %d", result);
+			(*env)->ThrowNew(env, ioException, (char *)errBuf);
+		}
+		return;
+	}
+
+	icmp_fd = WSASocket(AF_INET, SOCK_RAW, IPPROTO_ICMP, NULL, 0, WSA_FLAG_OVERLAPPED);
+	if (icmp_fd == -1)
+	{
+		int lastError = WSAGetLastError();
+		char errBuf[128];
+		jclass ioException = (*env)->FindClass(env, "java/net/SocketException");
+		if (ioException != NULL)
+		{
+			if (lastError == WSAEACCES)
+			{
+				sprintf(errBuf, "Socket exception %d: Permission denied", lastError);
+			} else {
+				sprintf(errBuf, "Socket exception %d", lastError);
+			}
+			(*env)->ThrowNew(env, ioException, (char *)errBuf);
+			return;
+		}
+	}
 #else
 	struct protoent *proto;
 
