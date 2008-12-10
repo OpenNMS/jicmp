@@ -119,6 +119,7 @@ if(APPLE)
 endif(APPLE)
 
 if(WIN32)
+	set_target_properties(jicmp PROPERTIES PREFIX "")
 	target_link_libraries(jicmp ws2_32)
 endif(WIN32)
 
