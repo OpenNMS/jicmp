@@ -56,7 +56,6 @@ check_include_files("ws2tcpip.h"                                                
 
 if(WIN32)
 	set(CMAKE_EXTRA_INCLUDE_FILES sys/types.h winsock2.h ws2tcpip.h win32/icmp.h)
-	set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS} "/NODEFAULTLIB:msvcrtd.lib")
 	add_definitions(-D__WIN32__)
 else(WIN32)
 	set(CMAKE_EXTRA_INCLUDE_FILES sys/types.h netinet/in.h netinet/in_systm.h netinet/ip.h netinet/ip_icmp.h)
