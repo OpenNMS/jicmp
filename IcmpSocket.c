@@ -10,6 +10,7 @@ OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
 
 Modifications:
 
+2008 Dec 10: More win32 cleanup, should be windows-HANDLE and 64-bit safe
 2008 Feb 05: Cleaned up win32 building, also merged patch from Alfred Reibenschuh <alfred.reibenschuh@it-austria.com>
 2007 Jul 25: Updated to be in a separate library; split out IcmpSocket.h, autoconfized tests
 2004 Oct 27: Handle Darwin 10.2 gracefully.
@@ -60,6 +61,8 @@ Tab Size = 8
 
 #include "IcmpSocket.h"
 #include <jni.h>
+
+#define MAX_PACKET 512
 
 #ifdef __WIN32__
 int gettimeofday (struct timeval *tv, void* tz)
@@ -287,7 +290,7 @@ static void setIcmpFd(JNIEnv *env, jobject instance, onms_socket fd_value)
 
 end_setfd:
 	/**
-	* method complete, value is -1 unless the
+	* method complete, value is INVALID_SOCKET unless the
 	* entire method is successful.
 	*/
 	return;
@@ -437,7 +440,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 	}
 
 	icmp_fd = WSASocket(AF_INET, SOCK_RAW, IPPROTO_ICMP, NULL, 0, WSA_FLAG_OVERLAPPED);
-	if (icmp_fd == -1)
+	if (icmp_fd == SOCKET_ERROR)
 	{
 		int lastError = errno;
 		char errBuf[128];
@@ -503,7 +506,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_receive (JNIEnv *env, jobject instanc
 	/**
 	* Get the current descriptor's value
 	*/
-	jint fd_value = getIcmpFd(env, instance);
+	onms_socket fd_value = getIcmpFd(env, instance);
 	if((*env)->ExceptionOccurred(env) != NULL)
 	{
 		goto end_recv; /* jump to end if necessary */
@@ -521,7 +524,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_receive (JNIEnv *env, jobject instanc
 	* must be dynamic for MT-Safe reasons and avoids blowing
 	* up the stack.
 	*/
-	inBuf = malloc(512);
+	inBuf = malloc(MAX_PACKET);
 	if(inBuf == NULL)
 	{
 		throwError(env, "java/lang/OutOfMemoryError", "Failed to allocate memory to receive ICMP datagram");
@@ -541,9 +544,9 @@ Java_org_opennms_protocols_icmp_IcmpSocket_receive (JNIEnv *env, jobject instanc
 	* will also include the IP header that preceeds
 	* the ICMP data, we'll strip that off later.
 	*/
-	iRC = recvfrom((int)fd_value,
+	iRC = recvfrom(fd_value,
 		inBuf,
-		512,
+		MAX_PACKET,
 		0,
 		(struct sockaddr *)&inAddr,
 		&inAddrLen);
@@ -721,7 +724,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_send (JNIEnv *env, jobject instance, 
 	* Recover the operating system file descriptor
 	* so that we can use it in the sendto function.
 	*/
-	jint icmpfd = getIcmpFd(env, instance);
+	onms_socket icmpfd = getIcmpFd(env, instance);
 
 	/**
 	* Check for exception
@@ -864,7 +867,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_send (JNIEnv *env, jobject instance, 
 	Addr.sin_port   = 0;
 	Addr.sin_addr.s_addr = netAddr;
 
-	iRC = sendto((int)icmpfd,
+	iRC = sendto(icmpfd,
 		(void *)outBuffer,
 		(int)bufferLen,
 		0,
