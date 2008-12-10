@@ -1,5 +1,7 @@
 project(jicmp)
 
+cmake_minimum_required(VERSION 2.4.3)
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I${CMAKE_CURRENT_SOURCE_DIR} -I${CMAKE_CURRENT_BINARY_DIR}")
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Java ICMP Library")
