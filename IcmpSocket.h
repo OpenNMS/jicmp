@@ -89,7 +89,7 @@
 #endif
 
 #ifdef HAVE_NETINET_IP_ICMP_H
-#include <netinet/ip_icmp.h> 
+#include <netinet/ip_icmp.h>
 #endif
 
 #ifdef HAVE_NETDB_H
@@ -195,7 +195,7 @@ typedef struct icmphdr icmphdr_t;
 }
 #endif
 
-/** 
+/**
  * This macro is used to recover the current time
  * in microseconds
  */
@@ -223,7 +223,7 @@ typedef struct icmphdr icmphdr_t;
 #endif
 
 /**
- * This constant specifies the length of a 
+ * This constant specifies the length of a
  * time field in the buffer
  */
 #ifndef TIME_LENGTH
@@ -238,7 +238,7 @@ typedef struct icmphdr icmphdr_t;
 # define ICMP_HEADER_LENGTH 8
 #endif
 
-/** 
+/**
  * specifies the offset of the sent time.
  */
 #ifndef SENTTIME_OFFSET
@@ -274,6 +274,19 @@ typedef struct icmphdr icmphdr_t;
 # define OPENNMS_TAG "OpenNMS!"
 # define OPENNMS_TAG_LEN 8
 # define OPENNMS_TAG_OFFSET (RTT_OFFSET + TIME_LENGTH)
+#endif
+
+/**
+ * Winsock uses SOCKET, which is a special kind of Windows
+ * HANDLE object, not just an int
+ **/
+
+#ifdef __WIN32__
+#define onms_socket SOCKET
+#else
+#define onms_socket int
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
 #endif
 
 #endif // _ICMPSOCKET_H

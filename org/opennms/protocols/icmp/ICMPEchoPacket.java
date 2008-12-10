@@ -113,7 +113,8 @@ public final class ICMPEchoPacket extends ICMPHeader {
      * @exception java.lang.UnsupportedOperationException
      *                Always thrown.
      */
-    private ICMPEchoPacket() {
+    @SuppressWarnings("unused")
+	private ICMPEchoPacket() {
         throw new java.lang.UnsupportedOperationException("illegal constructor call");
     }
 
@@ -257,7 +258,7 @@ public final class ICMPEchoPacket extends ICMPHeader {
         //
         // take care of any stray bytes
         //
-        if ((m_pad.length % 1) == 1)
+        if ((m_pad.length % 2) == 1)
             summer.add(m_pad[m_pad.length]);
 
         //

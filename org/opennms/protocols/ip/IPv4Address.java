@@ -269,7 +269,7 @@ public class IPv4Address extends Object implements Serializable {
      * 
      */
     public byte[] getAddressBytes() {
-        return m_addr;
+        return m_addr.clone();
     }
 
     /**
@@ -396,6 +396,13 @@ public class IPv4Address extends Object implements Serializable {
         }
 
         return bRC;
+    }
+
+    /**
+     * If you override equals() you need to make a hashCode implementation as well
+     */
+    public int hashCode() {
+    	return toString().hashCode();
     }
 
     /**

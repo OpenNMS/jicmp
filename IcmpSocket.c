@@ -54,6 +54,7 @@ Tab Size = 8
 
 #ifdef __WIN32__
 #define WIN32_LEAN_AND_MEAN
+#undef errno
 #define errno WSAGetLastError()
 #endif
 
@@ -97,7 +98,7 @@ unsigned short checksum(register unsigned short *p, register int sz)
 	register unsigned long sum = 0;	// need a 32-bit quantity
 
 	/*
-	* interate over the 16-bit values and 
+	* iterate over the 16-bit values and
 	* accumulate a sum.
 	*/
 	while(sz > 1)
@@ -110,36 +111,36 @@ unsigned short checksum(register unsigned short *p, register int sz)
 	{
 		/*
 		* cast the pointer to an unsigned char pointer,
-		* dereference and premote to an unsigned short.
-		* Shift in 8 zero bits and whalla the value
+		* dereference and promote to an unsigned short.
+		* Shift in 8 zero bits and voila the value
 		* is padded!
 		*/
 		sum += ((unsigned short) *((unsigned char *)p)) << 8;
 	}
 
 	/*
-	* Add back the bits that may have overflowed the 
+	* Add back the bits that may have overflowed the
 	* "16-bit" sum. First add high order 16 to low
 	* order 16, then repeat
 	*/
 	while(sum >> 16)
 		sum = (sum >> 16) + (sum & 0xffffUL);
 
-	sum = ~sum & 0xffffUL; 
+	sum = ~sum & 0xffffUL;
 	return (unsigned short)sum;
 }
 
 /**
 * This method is used to lookup the instances java.io.FileDescriptor
 * object and it's internal integer descriptor. This hidden integer
-* is used to store the opened ICMP socket handle that was 
+* is used to store the opened ICMP socket handle that was
 * allocated by the operating system.
 *
 * If the descriptor could not be recovered or has not been
 * set then a negative value is returned.
 *
 */
-static jint getIcmpFd(JNIEnv *env, jobject instance)
+static onms_socket getIcmpFd(JNIEnv *env, jobject instance)
 {
 	jclass	thisClass = NULL;
 	jclass	fdClass   = NULL;
@@ -148,7 +149,7 @@ static jint getIcmpFd(JNIEnv *env, jobject instance)
 	jobject  thisFdInstance = NULL;
 
 	jfieldID fdFdField = NULL;
-	jint	 fd_value  = -1;
+	onms_socket	fd_value  = INVALID_SOCKET;
 
 	/**
 	* Find the class that describes ourself.
@@ -186,9 +187,14 @@ static jint getIcmpFd(JNIEnv *env, jobject instance)
 	* Get the field identifier for the primitive integer
 	* that is part of the FileDescriptor class.
 	*/
+#ifdef __WIN32__
+	fdFdField = (*env)->GetFieldID(env, fdClass, "handle", "J");
+#else
 	fdFdField = (*env)->GetFieldID(env, fdClass, "fd", "I");
-	if(fdFdField == NULL || (*env)->ExceptionOccurred(env) != NULL)
+#endif
+	if (fdFdField == NULL || (*env)->ExceptionOccurred(env) != NULL) {
 		goto end_getfd;
+	}
 
 	(*env)->DeleteLocalRef(env, fdClass);
 	fdClass = NULL;
@@ -196,19 +202,23 @@ static jint getIcmpFd(JNIEnv *env, jobject instance)
 	/**
 	* Recover the value
 	*/
+#ifdef __WIN32__
+	fd_value = (*env)->GetLongField(env, thisFdInstance, fdFdField);
+#else
 	fd_value = (*env)->GetIntField(env, thisFdInstance, fdFdField);
+#endif
 
 	(*env)->DeleteLocalRef(env, thisFdInstance);
 
 end_getfd:
 	/**
-	* method complete, value is -1 unless the 
+	* method complete, value is INVALID_SOCKET unless the
 	* entire method is successful.
 	*/
 	return fd_value;
 }
 
-static void setIcmpFd(JNIEnv *env, jobject instance, jint fd_value)
+static void setIcmpFd(JNIEnv *env, jobject instance, onms_socket fd_value)
 {
 	jclass	thisClass = NULL;
 	jclass	fdClass   = NULL;
@@ -254,7 +264,11 @@ static void setIcmpFd(JNIEnv *env, jobject instance, jint fd_value)
 	* Get the field identifier for the primitive integer
 	* that is part of the FileDescriptor class.
 	*/
+#ifdef __WIN32__
+	fdFdField = (*env)->GetFieldID(env, fdClass, "handle", "J");
+#else
 	fdFdField = (*env)->GetFieldID(env, fdClass, "fd", "I");
+#endif
 	if(fdFdField == NULL || (*env)->ExceptionOccurred(env) != NULL)
 		goto end_setfd;
 
@@ -264,12 +278,16 @@ static void setIcmpFd(JNIEnv *env, jobject instance, jint fd_value)
 	/**
 	* Set the value
 	*/
+#ifdef __WIN32__
+	(*env)->SetLongField(env, thisFdInstance, fdFdField, fd_value);
+#else
 	(*env)->SetIntField(env, thisFdInstance, fdFdField, fd_value);
+#endif
 	(*env)->DeleteLocalRef(env, thisFdInstance);
 
 end_setfd:
 	/**
-	* method complete, value is -1 unless the 
+	* method complete, value is -1 unless the
 	* entire method is successful.
 	*/
 	return;
@@ -391,7 +409,7 @@ static void throwError(JNIEnv *env, char *exception, char *errorBuffer)
 * Opens a new raw socket that is set to send
 * and receive the ICMP protocol. The protocol
 * for 'icmp' is looked up using the function
-* getprotobyname() and passed to the newly 
+* getprotobyname() and passed to the newly
 * constructed socket.
 *
 * An exception is thrown if either of the
@@ -404,7 +422,7 @@ static void throwError(JNIEnv *env, char *exception, char *errorBuffer)
 JNIEXPORT void JNICALL
 Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject instance)
 {
-	int icmp_fd = -1;
+	onms_socket icmp_fd = INVALID_SOCKET;
 #ifdef __WIN32__
 	int result;
 	WSADATA info;
@@ -446,7 +464,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 	icmp_fd = socket(AF_INET, SOCK_RAW, proto->p_proto);
 #endif
 
-	if(icmp_fd < 0)
+	if(icmp_fd == SOCKET_ERROR)
 	{
 		char	errBuf[128];	/* for exceptions */
 		int	savedErrno  = errno;
@@ -664,7 +682,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_receive (JNIEnv *env, jobject instanc
 		(jint)0);
 
 	/**
-	* they will be deleted anyway, 
+	* they will be deleted anyway,
 	* but we're just speeding up the process.
 	*/
 	(*env)->DeleteLocalRef(env, addrInstance);
@@ -839,7 +857,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_send (JNIEnv *env, jobject instance, 
 	}
 
 	/**
-	* Now send the damn data before Jeff drives me nuts!
+	* Send the data
 	*/
 	memset(&Addr, 0, sizeof(Addr));
 	Addr.sin_family = AF_INET;
@@ -853,7 +871,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_send (JNIEnv *env, jobject instance, 
 		(struct sockaddr *)&Addr,
 		sizeof(Addr));
 
-	if(iRC == -1 && errno == EACCES)
+	if(iRC == SOCKET_ERROR && errno == EACCES)
 	{
 		throwError(env, "java/net/NoRouteToHostException", "cannot send to broadcast address");
 	}
@@ -881,11 +899,11 @@ end_send:
 JNIEXPORT void
 JNICALL Java_org_opennms_protocols_icmp_IcmpSocket_close (JNIEnv *env, jobject instance)
 {
-	jint fd_value = getIcmpFd(env, instance);
-	if(fd_value >= (jint)0 && (*env)->ExceptionOccurred(env) == NULL)
+	onms_socket fd_value = getIcmpFd(env, instance);
+	if(fd_value >= 0 && (*env)->ExceptionOccurred(env) == NULL)
 	{
-		close((int)fd_value);
-		setIcmpFd(env, instance, (jint)-1);
+		close(fd_value);
+		setIcmpFd(env, instance, INVALID_SOCKET);
 	}
 #ifdef __WIN32__
 	WSACleanup();
