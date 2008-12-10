@@ -52,6 +52,11 @@ Tab Size = 8
 
 #include <config.h>
 
+#ifdef __WIN32__
+#define WIN32_LEAN_AND_MEAN
+#define errno WSAGetLastError()
+#endif
+
 #include "IcmpSocket.h"
 #include <jni.h>
 
@@ -373,6 +378,15 @@ end_inet:
 	return retAddr;
 }
 
+static void throwError(JNIEnv *env, char *exception, char *errorBuffer)
+{
+	jclass ioException = (*env)->FindClass(env, exception);
+	if (ioException != NULL)
+	{
+		(*env)->ThrowNew(env, ioException, errorBuffer);
+	}
+}
+
 /*
 * Opens a new raw socket that is set to send
 * and receive the ICMP protocol. The protocol
@@ -399,32 +413,24 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 	if (result != 0)
 	{
 		char errBuf[128];
-		jclass ioException = (*env)->FindClass(env, "java/net/IOException");
-		if (ioException != NULL)
-		{
-			sprintf(errBuf, "WSAStartup failed: %d", result);
-			(*env)->ThrowNew(env, ioException, (char *)errBuf);
-		}
+		sprintf(errBuf, "WSAStartup failed: %d", result);
+		throwError(env, "java/net/IOException", errBuf);
 		return;
 	}
 
 	icmp_fd = WSASocket(AF_INET, SOCK_RAW, IPPROTO_ICMP, NULL, 0, WSA_FLAG_OVERLAPPED);
 	if (icmp_fd == -1)
 	{
-		int lastError = WSAGetLastError();
+		int lastError = errno;
 		char errBuf[128];
-		jclass ioException = (*env)->FindClass(env, "java/net/SocketException");
-		if (ioException != NULL)
+		if (lastError == WSAEACCES)
 		{
-			if (lastError == WSAEACCES)
-			{
-				sprintf(errBuf, "Socket exception %d: Permission denied", lastError);
-			} else {
-				sprintf(errBuf, "Socket exception %d", lastError);
-			}
-			(*env)->ThrowNew(env, ioException, (char *)errBuf);
-			return;
+			sprintf(errBuf, "Socket exception %d: Permission denied", lastError);
+		} else {
+			sprintf(errBuf, "Socket exception %d", lastError);
 		}
+		throwError(env, "java/net/SocketException", errBuf);
+		return;
 	}
 #else
 	struct protoent *proto;
@@ -432,12 +438,8 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 	proto = getprotobyname("icmp");
 	if (proto == (struct protoent *) NULL) {
 		char	errBuf[128];	/* for exceptions */
-		jclass  ioException = (*env)->FindClass(env, "java/net/SocketException");
-		if(ioException != NULL)
-		{
-			sprintf(errBuf, "Could not get protocol entry for 'icmp'.  The getprotobyname(\"icmp\") system call returned NULL.");
-			(*env)->ThrowNew(env, ioException, (char *)errBuf);
-		}
+		sprintf(errBuf, "Could not get protocol entry for 'icmp'.  The getprotobyname(\"icmp\") system call returned NULL.");
+		throwError(env, "java/net/SocketException", errBuf);
 		return;
 	}
 
@@ -448,12 +450,8 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 	{
 		char	errBuf[128];	/* for exceptions */
 		int	savedErrno  = errno;
-		jclass  ioException = (*env)->FindClass(env, "java/net/SocketException");
-		if(ioException != NULL)
-		{
-			snprintf(errBuf, sizeof(errBuf), "System error creating ICMP socket (%d, %s)", savedErrno, strerror(savedErrno));
-			(*env)->ThrowNew(env, ioException, (char *)errBuf);
-		}
+		snprintf(errBuf, sizeof(errBuf), "System error creating ICMP socket (%d, %s)", savedErrno, strerror(savedErrno));
+		throwError(env, "java/net/SocketException", errBuf);
 		return;
 	}
 
@@ -494,8 +492,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_receive (JNIEnv *env, jobject instanc
 	}
 	else if(fd_value < 0)
 	{
-		jclass ioEx = (*env)->FindClass(env, "java/io/IOException");
-		(*env)->ThrowNew(env, ioEx, "Invalid Socket Descriptor");
+		throwError(env, "java/io/IOException", "Invalid Socket Descriptor");
 		goto end_recv;
 	}
 
@@ -509,8 +506,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_receive (JNIEnv *env, jobject instanc
 	inBuf = malloc(512);
 	if(inBuf == NULL)
 	{
-		jclass noMem = (*env)->FindClass(env, "java/lang/OutOfMemoryError");
-		(*env)->ThrowNew(env, noMem, "Failed to allocate memory to receive icmp datagram");
+		throwError(env, "java/lang/OutOfMemoryError", "Failed to allocate memory to receive ICMP datagram");
 		goto end_recv;
 	}
 
@@ -540,10 +536,8 @@ Java_org_opennms_protocols_icmp_IcmpSocket_receive (JNIEnv *env, jobject instanc
 		*/
 		char errBuf[256];
 		int savedErrno = errno;
-		jclass ioEx = (*env)->FindClass(env, "java/io/IOException");
-
 		snprintf(errBuf, sizeof(errBuf), "Error reading data from the socket descriptor (%d, %s)", savedErrno, strerror(savedErrno));
-		(*env)->ThrowNew(env, ioEx, (char *)errBuf);
+		throwError(env, "java/io/IOException", errBuf);
 		goto end_recv;
 	}
 	else if(iRC == 0)
@@ -551,8 +545,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_receive (JNIEnv *env, jobject instanc
 		/*
 		* Error reading the information from the socket
 		*/
-		jclass ioEx = (*env)->FindClass(env, "java/io/EOFException");
-		(*env)->ThrowNew(env, ioEx, "End-Of-File returned from socket descriptor");
+		throwError(env, "java/io/EOFException", "End-of-File returned from socket descriptor");
 		goto end_recv;
 	}
 
@@ -569,8 +562,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_receive (JNIEnv *env, jobject instanc
 	iRC -= ipHdr->ONMS_IP_HL << 2;
 	if(iRC <= 0)
 	{
-		jclass ioEx = (*env)->FindClass(env, "java/io/IOException");
-		(*env)->ThrowNew(env, ioEx, "Malformed ICMP datagram received");
+		throwError(env, "java/io/IOException", "Malformed ICMP datagram received");
 		goto end_recv;
 	}
 	icmpHdr = (icmphdr_t *)((char *)inBuf + (ipHdr->ONMS_IP_HL << 2));
@@ -724,8 +716,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_send (JNIEnv *env, jobject instance, 
 	*/
 	if(icmpfd < 0)
 	{
-		jclass ioEx = (*env)->FindClass(env, "java/io/IOException");
-		(*env)->ThrowNew(env, ioEx, "Invalid File Descriptor");
+		throwError(env, "java/io/IOException", "Invalid file descriptor");
 		goto end_send;
 	}
 
@@ -787,8 +778,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_send (JNIEnv *env, jobject instance, 
 	bufferLen = (*env)->GetArrayLength(env, icmpDataArray);
 	if(bufferLen <= 0)
 	{
-		jclass ioEx = (*env)->FindClass(env, "java/io/IOException");
-		(*env)->ThrowNew(env, ioEx, "Insufficent data");
+		throwError(env, "java/io/IOException", "Insufficient data");
 		goto end_send;
 	}
 
@@ -801,10 +791,9 @@ Java_org_opennms_protocols_icmp_IcmpSocket_send (JNIEnv *env, jobject instance, 
 	{
 		char buf[128]; /* error condition: java.lang.OutOfMemoryError! */
 		int serror = errno;
-		jclass memEx = (*env)->FindClass(env, "java/lang/OutOfMemoryError");
-
 		snprintf(buf, sizeof(buf), "Insufficent Memory (%d, %s)", serror, strerror(serror));
-		(*env)->ThrowNew(env, memEx, (const char *)buf);
+
+		throwError(env, "java/lang/OutOfMemoryError", buf);
 		goto end_send;
 	}
 
@@ -866,17 +855,14 @@ Java_org_opennms_protocols_icmp_IcmpSocket_send (JNIEnv *env, jobject instance, 
 
 	if(iRC == -1 && errno == EACCES)
 	{
-		jclass ioEx = (*env)->FindClass(env, "java/net/NoRouteToHostException");
-		(*env)->ThrowNew(env, ioEx, "cannot send to broadcast address");
+		throwError(env, "java/net/NoRouteToHostException", "cannot send to broadcast address");
 	}
 	else if(iRC != bufferLen)
 	{
 		char buf[128];
 		int serror = errno;
-		jclass ioEx = (*env)->FindClass(env, "java/io/IOException");
-
 		snprintf(buf, sizeof(buf), "sendto error (%d, %s)", serror, strerror(serror));
-		(*env)->ThrowNew(env, ioEx, (const char *)buf);
+		throwError(env, "java/io/IOException", buf);
 	}
 
 
@@ -901,5 +887,8 @@ JNICALL Java_org_opennms_protocols_icmp_IcmpSocket_close (JNIEnv *env, jobject i
 		close((int)fd_value);
 		setIcmpFd(env, instance, (jint)-1);
 	}
+#ifdef __WIN32__
+	WSACleanup();
+#endif
 	return;
 }
