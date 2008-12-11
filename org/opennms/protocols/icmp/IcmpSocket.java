@@ -43,6 +43,7 @@ package org.opennms.protocols.icmp;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.InetAddress;
 
 /**
  * This class provides a bridge between the host operating system so that ICMP
@@ -71,7 +72,7 @@ public final class IcmpSocket {
      * It looks unused, but it is used solely by native code.
      */
     @SuppressWarnings("unused")
-    private FileDescriptor m_rawFd;
+    private final FileDescriptor m_rawFd;
 
     /**
      * This method is used to open the initial operating system icmp socket. The
@@ -105,6 +106,16 @@ public final class IcmpSocket {
 
         m_rawFd = new FileDescriptor();
         initSocket();
+        String osName = System.getProperty("os.name");
+        if (osName != null && osName.toLowerCase().startsWith("windows")) {
+        	// Windows complains if you receive before sending a packet
+	        ICMPEchoPacket p = new ICMPEchoPacket(0);
+	        p.setIdentity((short) 0);
+	        p.computeChecksum();
+	        byte[] buf = p.toBytes();
+	        DatagramPacket dgp = new DatagramPacket(buf, buf.length, InetAddress.getByName("127.0.0.1"), 0);
+	        send(dgp);
+        }
     }
     
     private Logger log() {
