@@ -1,3 +1,17 @@
+1.0.9
+-----
+* major Win32 fixes, including a bug that would cause exceptions if you
+  start attempting to receive packets before the first is sent
+* support for building on Win64 (use the java.io.FileDescriptor's 'handle'
+  rather than 'fd', since SOCKETs on Windows are a native HANDLE type)
+* minor build-system cleanup; CMake still only works with visual studio on
+  Win32 right now; for MinGW use MSYS and autoconf
+
+1.0.8
+-----
+* build system cleanups
+* minor Win32 fixes
+
 1.0.7
 -----
 * implement CMake for easier portability
