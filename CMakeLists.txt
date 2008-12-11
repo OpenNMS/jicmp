@@ -54,6 +54,7 @@ check_include_files("winsock2.h"                                                
 check_include_files("ws2def.h"                                                                   HAVE_WS2DEF_H)
 check_include_files("ws2tcpip.h"                                                                 HAVE_WS2TCPIP_H)
 
+add_definitions(-D_JNI_IMPLEMENTATION_ -DDLL_EXPORT -DPIC)
 if(WIN32)
 	set(CMAKE_EXTRA_INCLUDE_FILES sys/types.h winsock2.h ws2tcpip.h win32/icmp.h)
 	add_definitions(-D__WIN32__)
