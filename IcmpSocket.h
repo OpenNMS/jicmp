@@ -112,28 +112,32 @@
 
 #ifdef HAVE_WINSOCK2_H
 
-#ifdef HAVE_WS2DEF_H
-#include <ws2def.h>
-#endif
+# ifdef HAVE_WS2DEF_H
+#  include <ws2def.h>
+# endif
 
-#include <winsock2.h>
+# include <winsock2.h>
 
-#ifdef HAVE_WS2TCPIP_H
-#include <ws2tcpip.h>
-#endif
+# ifdef HAVE_WS2TCPIP_H
+#  include <ws2tcpip.h>
+# endif
 
-#include "win32/icmp.h"
-#ifndef HAVE_STDINT_H
-typedef u_int in_addr_t;
-typedef u_int64 uint64_t;
-#endif
+# include "win32/icmp.h"
+# ifndef HAVE_STDINT_H
+   typedef u_int in_addr_t;
+   typedef u_int64 uint64_t;
+# endif
 
-#ifndef __MINGW32__
-/* Visual Studio */
-#define close closesocket
-#define snprintf _snprintf
-#pragma warning(disable: 4996)
-#endif
+# ifdef __MINGW32__
+#  ifdef HAVE_STDINT_H
+    typedef u_int in_addr_t;
+#  endif
+# else
+   /* Visual Studio */
+#  define close closesocket
+#  define snprintf _snprintf
+#  pragma warning(disable: 4996)
+# endif
 #endif
 
 /**

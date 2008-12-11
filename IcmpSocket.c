@@ -53,18 +53,16 @@ Tab Size = 8
 
 #include <config.h>
 
-#ifdef __WIN32__
-#define WIN32_LEAN_AND_MEAN
-#undef errno
-#define errno WSAGetLastError()
-#endif
-
 #include "IcmpSocket.h"
 #include <jni.h>
 
 #define MAX_PACKET 512
 
 #ifdef __WIN32__
+#define WIN32_LEAN_AND_MEAN
+#undef errno
+#define errno WSAGetLastError()
+
 int gettimeofday (struct timeval *tv, void* tz)
 {
 	union {
@@ -439,21 +437,8 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 		return;
 	}
 
-	icmp_fd = WSASocket(AF_INET, SOCK_RAW, IPPROTO_ICMP, NULL, 0, WSA_FLAG_OVERLAPPED);
-	if (icmp_fd == SOCKET_ERROR)
-	{
-		int lastError = errno;
-		char errBuf[128];
-		if (lastError == WSAEACCES)
-		{
-			sprintf(errBuf, "Socket exception %d: Permission denied", lastError);
-		} else {
-			sprintf(errBuf, "Socket exception %d", lastError);
-		}
-		throwError(env, "java/net/SocketException", errBuf);
-		return;
-	}
-#else
+#endif
+
 	struct protoent *proto;
 
 	proto = getprotobyname("icmp");
@@ -465,7 +450,6 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 	}
 
 	icmp_fd = socket(AF_INET, SOCK_RAW, proto->p_proto);
-#endif
 
 	if(icmp_fd == SOCKET_ERROR)
 	{
@@ -530,6 +514,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_receive (JNIEnv *env, jobject instanc
 		throwError(env, "java/lang/OutOfMemoryError", "Failed to allocate memory to receive ICMP datagram");
 		goto end_recv;
 	}
+	memset(inBuf, 0, MAX_PACKET);
 
 	/**
 	* Clear out the address structures where the
@@ -541,23 +526,18 @@ Java_org_opennms_protocols_icmp_IcmpSocket_receive (JNIEnv *env, jobject instanc
 
 	/**
 	* Receive the data from the operating system. This
-	* will also include the IP header that preceeds
+	* will also include the IP header that precedes
 	* the ICMP data, we'll strip that off later.
 	*/
-	iRC = recvfrom(fd_value,
-		inBuf,
-		MAX_PACKET,
-		0,
-		(struct sockaddr *)&inAddr,
-		&inAddrLen);
-	if(iRC < 0)
+	iRC = recvfrom(fd_value, inBuf, MAX_PACKET, 0, (struct sockaddr *)&inAddr, &inAddrLen);
+	if(iRC == SOCKET_ERROR)
 	{
 		/*
 		* Error reading the information from the socket
 		*/
 		char errBuf[256];
 		int savedErrno = errno;
-		snprintf(errBuf, sizeof(errBuf), "Error reading data from the socket descriptor (%d, %s)", savedErrno, strerror(savedErrno));
+		snprintf(errBuf, sizeof(errBuf), "Error reading data from the socket descriptor (iRC = %d, fd_value = %d, %d, %s)", iRC, fd_value, savedErrno, strerror(savedErrno));
 		throwError(env, "java/io/IOException", errBuf);
 		goto end_recv;
 	}
