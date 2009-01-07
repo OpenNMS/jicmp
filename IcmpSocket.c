@@ -56,7 +56,11 @@ Tab Size = 8
 #include "IcmpSocket.h"
 #include <jni.h>
 
-#define MAX_PACKET 512
+#ifdef IP_MAXPACKET
+#define MAX_PACKET IP_MAXPACKET
+#else
+#define MAX_PACKET 65535
+#endif
 
 #ifdef __WIN32__
 #define WIN32_LEAN_AND_MEAN
