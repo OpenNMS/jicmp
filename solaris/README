@@ -1,0 +1,11 @@
+Building
+--------
+
+If you have Sun CC, all you should have to do is "make".
+
+If you are building with GCC, and want 64-bit binaries, you have to jump
+through some hoops.  I was able to build against sunfreeware GCC with this:
+
+make CC=gcc CFLAGS64=-m64 \
+	LDFLAGS64="-L/usr/sfw/lib/sparcv9 -R/usr/sfw/lib/sparcv9 -Wl,-64" \
+	ARGS64="--build=sparc64-sun-solaris2.10" ARGS32="--build=sparc-sun-solaris2.10"
