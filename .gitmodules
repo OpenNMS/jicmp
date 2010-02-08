@@ -1,0 +1,6 @@
+[submodule "debian"]
+	path = debian
+	url = ../debian-jicmp
+[submodule "m4"]
+	path = m4
+	url = ../autotools
