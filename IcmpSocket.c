@@ -427,6 +427,7 @@ static void throwError(JNIEnv *env, char *exception, char *errorBuffer)
 JNIEXPORT void JNICALL
 Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject instance)
 {
+	struct protoent *proto;
 	onms_socket icmp_fd = INVALID_SOCKET;
 #ifdef __WIN32__
 	int result;
@@ -442,8 +443,6 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 	}
 
 #endif
-
-	struct protoent *proto;
 
 	proto = getprotobyname("icmp");
 	if (proto == (struct protoent *) NULL) {
