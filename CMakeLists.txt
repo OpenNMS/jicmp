@@ -122,6 +122,18 @@ endif(APPLE)
 if(WIN32)
 	set_target_properties(jicmp PROPERTIES PREFIX "")
 	target_link_libraries(jicmp ws2_32)
+
+	foreach(flag_var
+		CMAKE_CXX_FLAGS
+		CMAKE_CXX_FLAGS_DEBUG
+		CMAKE_CXX_FLAGS_RELEASE
+		CMAKE_CXX_FLAGS_MINSIZEREL
+		CMAKE_CXX_FLAGS_RELWITHDEBINFO
+	)
+		if(${flag_var} MATCHES "/MD")
+			string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+		endif(${flag_var} MATCHES "/MD")
+	endforeach(flag_var)
 endif(WIN32)
 
 add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/jicmp.jar" COMMAND ${JAVA_ARCHIVE} -cvf jicmp.jar org DEPENDS ${JAVA_CLASS_FILES} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
