@@ -2,6 +2,9 @@
 .*.swp
 *.tar.gz
 .deps
+.libs
+*.lo
+*.la
 Makefile
 Makefile.in
 aclocal.m4
@@ -24,3 +27,4 @@ missing
 pom.xml
 solaris/pkginfo
 stamp-h1
+jicmp.jar
