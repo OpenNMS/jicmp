@@ -1,3 +1,9 @@
+jicmp (1.0.12-1) unstable; urgency=low
+
+  * updated to new version
+
+ -- Benjamin Reed <ranger@opennms.org>  Thu, 18 Nov 2010 14:53:00 -0500
+
 jicmp (1.0.8-1) unstable; urgency=low
 
   * updated to new version, incorporated some build modernization from topquark
