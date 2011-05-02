@@ -452,7 +452,12 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 		return;
 	}
 
-	icmp_fd = socket(AF_INET, SOCK_RAW, proto->p_proto);
+#if defined(__APPLE__)
+#define SOCK_TYPE SOCK_DGRAM
+#else
+#define SOCK_TYPE SOCK_RAW
+#endif
+	icmp_fd = socket(AF_INET, SOCK_TYPE, proto->p_proto);
 
 	if(icmp_fd == SOCKET_ERROR)
 	{
