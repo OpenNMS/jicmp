@@ -1,3 +1,26 @@
+1.2.0
+-----
+* Use newer libkern/OSByteOrder.h on Mac OS X if available.
+* Enable running as non-root on systems that support using SOCK_DGRAM
+__for sending ICMP packets.  (set environment variable $JICMP_USE_SOCK_DGRAM
+__to enable)  Note: you can get different errno values if you use this option,
+__be prepared to handle it properly in your code.
+
+1.0.12
+------
+* Fix to work with picky compilers
+* Fixes for some Windows compilation issues
+* Clean up build system since moving to git
+
+1.0.11
+------
+* Fix for building on S390x
+
+1.0.10
+------
+* Solaris 64-bit build fixes
+* A few minor build-system tweaks
+
 1.0.10
 ------
 * Solaris 64-bit build fixes
