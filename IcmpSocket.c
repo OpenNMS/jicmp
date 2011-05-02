@@ -429,6 +429,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 {
 	struct protoent *proto;
 	onms_socket icmp_fd = INVALID_SOCKET;
+	int sock_type = SOCK_RAW;
 #ifdef __WIN32__
 	int result;
 	WSADATA info;
@@ -452,12 +453,12 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 		return;
 	}
 
-#if defined(__APPLE__)
-#define SOCK_TYPE SOCK_DGRAM
-#else
-#define SOCK_TYPE SOCK_RAW
+#if HAVE_GETENV
+	if (getenv ("JICMP_USE_SOCK_DGRAM") != NULL) {
+		sock_type = SOCK_DGRAM;
+   }
 #endif
-	icmp_fd = socket(AF_INET, SOCK_TYPE, proto->p_proto);
+	icmp_fd = socket(AF_INET, sock_type, proto->p_proto);
 
 	if(icmp_fd == SOCKET_ERROR)
 	{
