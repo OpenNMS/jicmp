@@ -145,7 +145,12 @@
  */
 
 
-#ifdef HAVE_ARCHITECTURE_BYTE_ORDER_H
+#ifdef HAVE_LIBKERN_OSBYTEORDER_H
+# include <libkern/OSByteOrder.h>
+# define ntohll(_x_) OSSwapBigToHostInt64(_x_)
+# define htonll(_x_) OSSwapHostToBigInt64(_x_)
+
+#elif HAVE_ARCHITECTURE_BYTE_ORDER_H
 # include <architecture/byte_order.h>
 # define ntohll(_x_) NXSwapBigLongLongToHost(_x_)
 # define htonll(_x_) NXSwapHostLongLongToBig(_x_)
