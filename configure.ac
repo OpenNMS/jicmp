@@ -110,4 +110,5 @@ esac
 AM_CONDITIONAL([WIN32], [test x$on_win32 = xyes])
 
 AC_CONFIG_FILES([Makefile jicmp.spec pom.xml solaris/pkginfo])
+AC_CONFIG_FILES([tests.sh], [chmod +x tests.sh])
 AC_OUTPUT

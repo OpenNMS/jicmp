@@ -44,6 +44,8 @@ libjicmp_la_SOURCES = $(JICMP_SOURCES)
 libjicmp_la_LDFLAGS = $(JICMP_LDFLAGS)
 endif
 
+TESTS_ENVIRONMENT = $(LIBTOOL) --mode=execute -dlopen $(top_builddir)/libjicmp.la
+TESTS = tests.sh
 MAINTAINERCLEANFILES = aclocal.m4 config.guess config.sub configure depcomp install-sh ltmain.sh Makefile.in missing config.h.in *~ *.tar.gz
 CLEANFILES = org_*.h jicmp.jar
 
@@ -76,6 +78,8 @@ deploy:
 .PHONY: deploy rpm
 
 EXTRA_DIST = ChangeLog solaris/pkginfo $(JAVA_FILES) win32/icmp.h CMakeLists.txt config.h.cmake \
+	tests.sh \
+	tests/*.java \
 	m4/* \
 	debian/changelog \
 	debian/compat \

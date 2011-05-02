@@ -1,0 +1,12 @@
+#!/bin/sh
+
+export JAVA_HOME="@JAVA_HOME@"
+export SOURCEDIR="@top_srcdir@"
+export BUILDDIR="@top_builddir@"
+
+echo DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH"
+mkdir -p "$BUILDDIR/tests"
+for file in "$SOURCEDIR"/tests/*.java; do
+	"$JAVA_HOME/bin/javac" -cp "$BUILDDIR/jicmp.jar" "$file"
+	"$JAVA_HOME/bin/java" -cp "$BUILDDIR/jicmp.jar:$BUILDDIR/tests" `echo "$file" | sed -e 's,^.*/,,' -e 's,.java$,,'`
+done

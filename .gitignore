@@ -29,4 +29,6 @@ missing
 pom.xml
 solaris/pkginfo
 stamp-h1
+tests.sh
+tests/*.class
 jicmp.jar
