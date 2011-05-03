@@ -2,6 +2,7 @@
 *.spec
 .*.swp
 *.tar.gz
+*.cdbs*
 .deps
 .libs
 *.lo
@@ -11,6 +12,7 @@ Makefile
 Makefile.in
 aclocal.m4
 autom4te.cache
+build-tree
 classes
 config.guess
 config.h
