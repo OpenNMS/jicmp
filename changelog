@@ -1,3 +1,10 @@
+jicmp (1.2.1-1) unstable; urgency=medium
+
+  * New in the 1.2.x series is support for SOCK_DGRAM sockets on OSes
+    that support it.
+
+ -- Benjamin Reed <ranger@opennms.org>  Fri, 29 Jul 2011 14:26:00 -0500
+
 jicmp (1.0.12-1) unstable; urgency=low
 
   * updated to new version
