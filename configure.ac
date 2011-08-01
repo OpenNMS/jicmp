@@ -11,6 +11,7 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE([1.9 foreign])
 AC_ENABLE_STATIC([no])
+LT_PREREQ([2.0])
 
 # don't test c++ and f77 in libtool
 m4_ifdef([AC_LIBTOOL_TAGS], [AC_LIBTOOL_TAGS([])])
