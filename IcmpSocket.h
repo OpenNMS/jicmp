@@ -144,34 +144,49 @@
  * Macros for doing byte swapping
  */
 
-
 #ifdef HAVE_LIBKERN_OSBYTEORDER_H
 # include <libkern/OSByteOrder.h>
-# define ntohll(_x_) OSSwapBigToHostInt64(_x_)
-# define htonll(_x_) OSSwapHostToBigInt64(_x_)
-
-#elif HAVE_ARCHITECTURE_BYTE_ORDER_H
-# include <architecture/byte_order.h>
-# define ntohll(_x_) NXSwapBigLongLongToHost(_x_)
-# define htonll(_x_) NXSwapHostLongLongToBig(_x_)
-
-#elif defined(WORDS_BIGENDIAN)
-#  define ntohll(_x_) (_x_)
-#  define htonll(_x_) (_x_)
-
-#elif defined(BSWAP_64)
-#define ntohll(_x_) BSWAP_64(_x_)
-#define htonll(_x_) BSWAP_64(_x_)
-
-#elif defined(__bswap_64)
-#define ntohll(_x_) __bswap_64(_x_)
-#define htonll(_x_) __bswap_64(_x_)
-
-#else
-# define ntohll(_x_) bswap_64(_x_)
-# define htonll(_x_) bswap_64(_x_)
-
 #endif
+
+#if HAVE_ARCHITECTURE_BYTE_ORDER_H
+# include <architecture/byte_order.h>
+#endif
+
+#if !defined(ntohll)
+
+# ifdef HAVE_LIBKERN_OSBYTEORDER_H
+#  define ntohll(_x_) OSSwapBigToHostInt64(_x_)
+# elif HAVE_ARCHITECTURE_BYTE_ORDER_H
+#  define ntohll(_x_) NXSwapBigLongLongToHost(_x_)
+# elif defined(WORDS_BIGENDIAN)
+#   define ntohll(_x_) (_x_)
+# elif defined(BSWAP_64)
+#  define ntohll(_x_) BSWAP_64(_x_)
+# elif defined(__bswap_64)
+#  define ntohll(_x_) __bswap_64(_x_)
+# else
+#  define ntohll(_x_) bswap_64(_x_)
+# endif
+
+#endif // !defined(ntohll)
+
+#if !defined(htonll)
+
+# ifdef HAVE_LIBKERN_OSBYTEORDER_H
+#  define htonll(_x_) OSSwapHostToBigInt64(_x_)
+# elif HAVE_ARCHITECTURE_BYTE_ORDER_H
+#  define htonll(_x_) NXSwapHostLongLongToBig(_x_)
+# elif defined(WORDS_BIGENDIAN)
+#   define htonll(_x_) (_x_)
+# elif defined(BSWAP_64)
+#  define htonll(_x_) BSWAP_64(_x_)
+# elif defined(__bswap_64)
+#  define htonll(_x_) __bswap_64(_x_)
+# else
+#  define htonll(_x_) bswap_64(_x_)
+# endif
+
+#endif // !defined(htonll)
 
 #if defined(HAVE_STRUCT_IP)
 typedef struct ip iphdr_t;
