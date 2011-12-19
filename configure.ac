@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([jicmp], [1.2.2], [http://www.opennms.org])
+AC_INIT([jicmp], [1.3.0], [http://www.opennms.org])
 
 RELEASE=1
 AC_SUBST([RELEASE])
