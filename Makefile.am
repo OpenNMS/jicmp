@@ -1,31 +1,18 @@
 ACLOCAL_AMFLAGS = -I m4
 AM_CPPFLAGS = $(JNI_INCLUDES) -I$(top_srcdir) -I$(top_builddir)
 
-CLASS_FILES = org/opennms/protocols/icmp/AddressMaskReply.class \
-	org/opennms/protocols/icmp/AddressMaskRequest.class \
-	org/opennms/protocols/icmp/ErrorMessage.class \
-	org/opennms/protocols/icmp/ICMPEchoPacket.class \
-	org/opennms/protocols/icmp/ICMPHeader.class \
-	org/opennms/protocols/icmp/IcmpSocket.class \
-	org/opennms/protocols/icmp/TimestampReply.class \
-	org/opennms/protocols/icmp/TimestampRequest.class \
-	org/opennms/protocols/ip/IPHeader.class \
-	org/opennms/protocols/ip/IPv4Address.class \
-	org/opennms/protocols/ip/OC16ChecksumProducer.class \
-	org/opennms/protocols/ip/UnknownIPVersionException.class
-
-JAVA_FILES = org/opennms/protocols/icmp/AddressMaskReply.java \
-	org/opennms/protocols/icmp/AddressMaskRequest.java \
-	org/opennms/protocols/icmp/ErrorMessage.java \
-	org/opennms/protocols/icmp/ICMPEchoPacket.java \
-	org/opennms/protocols/icmp/ICMPHeader.java \
-	org/opennms/protocols/icmp/IcmpSocket.java \
-	org/opennms/protocols/icmp/TimestampReply.java \
-	org/opennms/protocols/icmp/TimestampRequest.java \
-	org/opennms/protocols/ip/IPHeader.java \
-	org/opennms/protocols/ip/IPv4Address.java \
-	org/opennms/protocols/ip/OC16ChecksumProducer.java \
-	org/opennms/protocols/ip/UnknownIPVersionException.java
+JAVA_FILES = src/main/java/org/opennms/protocols/icmp/AddressMaskReply.java \
+	src/main/java/org/opennms/protocols/icmp/AddressMaskRequest.java \
+	src/main/java/org/opennms/protocols/icmp/ErrorMessage.java \
+	src/main/java/org/opennms/protocols/icmp/ICMPEchoPacket.java \
+	src/main/java/org/opennms/protocols/icmp/ICMPHeader.java \
+	src/main/java/org/opennms/protocols/icmp/IcmpSocket.java \
+	src/main/java/org/opennms/protocols/icmp/TimestampReply.java \
+	src/main/java/org/opennms/protocols/icmp/TimestampRequest.java \
+	src/main/java/org/opennms/protocols/ip/IPHeader.java \
+	src/main/java/org/opennms/protocols/ip/IPv4Address.java \
+	src/main/java/org/opennms/protocols/ip/OC16ChecksumProducer.java \
+	src/main/java/org/opennms/protocols/ip/UnknownIPVersionException.java
 
 classdir=classes
 VPATH += $(classdir)

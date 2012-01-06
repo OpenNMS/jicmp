@@ -7,7 +7,6 @@
   <packaging>jar</packaging>
   <name>OpenNMS ICMP API</name>
   <build>
-    <sourceDirectory>${basedir}</sourceDirectory>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
