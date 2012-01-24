@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jicmp", "jicmp.vcxproj", "{B440F1B9-F87B-4574-AF64-60EA1B78CE4A}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "JicmpMergeModule", "JicmpMergeModule.vdproj", "{C47B034D-76CD-4F18-B584-7E702198C29B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B440F1B9-F87B-4574-AF64-60EA1B78CE4A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B440F1B9-F87B-4574-AF64-60EA1B78CE4A}.Debug|Win32.Build.0 = Debug|Win32
+		{B440F1B9-F87B-4574-AF64-60EA1B78CE4A}.Debug|x64.ActiveCfg = Debug|x64
+		{B440F1B9-F87B-4574-AF64-60EA1B78CE4A}.Debug|x64.Build.0 = Debug|x64
+		{B440F1B9-F87B-4574-AF64-60EA1B78CE4A}.Release|Win32.ActiveCfg = Release|Win32
+		{B440F1B9-F87B-4574-AF64-60EA1B78CE4A}.Release|Win32.Build.0 = Release|Win32
+		{B440F1B9-F87B-4574-AF64-60EA1B78CE4A}.Release|x64.ActiveCfg = Release|x64
+		{B440F1B9-F87B-4574-AF64-60EA1B78CE4A}.Release|x64.Build.0 = Release|x64
+		{C47B034D-76CD-4F18-B584-7E702198C29B}.Debug|Win32.ActiveCfg = Debug
+		{C47B034D-76CD-4F18-B584-7E702198C29B}.Debug|Win32.Build.0 = Debug
+		{C47B034D-76CD-4F18-B584-7E702198C29B}.Debug|x64.ActiveCfg = Debug
+		{C47B034D-76CD-4F18-B584-7E702198C29B}.Debug|x64.Build.0 = Debug
+		{C47B034D-76CD-4F18-B584-7E702198C29B}.Release|Win32.ActiveCfg = Release
+		{C47B034D-76CD-4F18-B584-7E702198C29B}.Release|Win32.Build.0 = Release
+		{C47B034D-76CD-4F18-B584-7E702198C29B}.Release|x64.ActiveCfg = Release
+		{C47B034D-76CD-4F18-B584-7E702198C29B}.Release|x64.Build.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
