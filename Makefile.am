@@ -88,6 +88,6 @@ $(RPM_TARGET): $(DISTFILES)
 	${MAKE} dist
 	-mkdir -p $(RPM_DIR)/SRPMS
 	-mkdir -p `dirname $(RPM_TARGET)`
-	$(RPMBUILD_PROG) $(RPM_ARGS) $(RPM_TARBALL)
+	$(RPMBUILD_PROG) --define 'version $(VERSION)' --define 'rel $(RELEASE)' $(RPM_ARGS) $(RPM_TARBALL)
 	@echo "$(RPM_TARGET) created"
 endif
