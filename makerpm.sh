@@ -156,20 +156,21 @@ function main()
         make rpm VERSION="$VERSION" RELEASE="$RELEASE"
     fi
 
+    RPM=$(make print_rpm)
+
     if $SIGN; then
 
-        RPMS=$(find . -name \*.rpm)
         #run rpm --define "_signature gpg" --define "_gpg_name $SIGN_ID" --resign "$RPMS"
 
-        run expect -c "set timeout -1; spawn rpm --define \"_signature gpg\" --define \"_gpg_name $SIGN_ID\" --resign $RPMS; match_max 100000; expect \"Enter pass phrase: \"; send -- \"${SIGN_PASSWORD}\r\"; expect eof" || \
+        run expect -c "set timeout -1; spawn rpm --define \"_signature gpg\" --define \"_gpg_name $SIGN_ID\" --resign $RPM; match_max 100000; expect \"Enter pass phrase: \"; send -- \"${SIGN_PASSWORD}\r\"; expect eof" || \
             die "RPM signing failed for $(branch)"
 
     fi
 
-    echo "==== OpenNMS RPM Build Finished ===="
+    echo "==== RPM Build Finished ===="
 
     echo ""
-    echo "Your completed RPM is at: $RPMS"
+    echo "Your completed RPM is at: $RPM"
 }
 
 main "$@"

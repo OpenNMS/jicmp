@@ -79,6 +79,9 @@ EXTRA_DIST = ChangeLog solaris/pkginfo $(JAVA_FILES) win32/icmp.h CMakeLists.txt
 if MAKE_RPMS
 rpm: @RPM_TARGET@
 
+print_rpm: @RPM_TARGET@
+	@echo $(RPM_TARGET)
+
 EXTRA_DIST += jicmp.spec
 
 $(RPM_TARGET): $(DISTFILES)
