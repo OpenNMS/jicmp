@@ -1,2 +1,0 @@
-"c:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE\devenv" jicmp.sln /build "Release|Win32" 
-"c:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE\devenv" jicmp.sln /build "Release|x64" 

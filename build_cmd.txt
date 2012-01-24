@@ -1,0 +1,5 @@
+"c:\Program Files\Java\jdk1.6.0_30\bin\javac" -d classes src/main/java/org/opennms/protocols/icmp/*.java src/main/java/org/opennms/protocols/ip/*.java 
+"c:\Program Files\Java\jdk1.6.0_30\bin\javah" -classpath classes org.opennms.protocols.icmp.IcmpSocket 
+cd win32
+"c:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE\devenv" jicmp.sln /build "Release|Win32" 
+"c:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE\devenv" jicmp.sln /build "Release|x64" 
