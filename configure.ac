@@ -5,7 +5,7 @@ m4_include([version.m4])
 AC_PREREQ(2.59)
 AC_INIT([jicmp], VERSION_NUMBER, [http://www.opennms.org])
 
-RELEASE=1
+AC_ARG_WITH([rpm-release],[  --with-rpm-release=RELEASE  The RPM release number (default: 1)], RELEASE="$withval", RELEASE="1")
 AC_SUBST([RELEASE])
 
 AC_CONFIG_MACRO_DIR([m4])

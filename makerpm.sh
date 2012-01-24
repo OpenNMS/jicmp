@@ -152,8 +152,8 @@ function main()
         echo
 
         autoreconf -fvi
-        ./configure
-        make rpm VERSION="$VERSION" RELEASE="$RELEASE"
+        ./configure --with-rpm-release="$RELEASE"
+        make rpm
     fi
 
     RPM=$(make print_rpm)
