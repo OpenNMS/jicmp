@@ -1,8 +1,9 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
+m4_include([version.m4])
 AC_PREREQ(2.59)
-AC_INIT([jicmp], [1.3.0], [http://www.opennms.org])
+AC_INIT([jicmp], VERSION_NUMBER, [http://www.opennms.org])
 
 RELEASE=1
 AC_SUBST([RELEASE])
