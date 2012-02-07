@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+print "ARGS=@ARGV\n";
+
 print "Building Java Code\n";
 mkdir("classes");
 handle_errors_and_exit_on_failure(system("c:\\Program Files\\Java\\jdk1.6.0_30\\bin\\javac", "-d", "classes", "-sourcepath", "src/main/java", "src/main/java/org/opennms/protocols/icmp/IcmpSocket.java"));
