@@ -3,7 +3,7 @@
 "VSVersion" = "3:800"
 "ProjectType" = "8:{06A35CCD-C46D-44D5-987B-CF40FF872267}"
 "IsWebType" = "8:FALSE"
-"ProjectName" = "8:JicmpMergeModule"
+"ProjectName" = "8:jicmp-x86MSM"
 "LanguageId" = "3:1033"
 "CodePage" = "3:1252"
 "UILanguageId" = "3:1033"
@@ -15,7 +15,7 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_4AB7A60880784B1FACD8A7FA6D1B7FAD"
+        "MsmKey" = "8:_25B108C561164380A508D05A08CF82A8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -27,7 +27,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Debug\\JicmpMergeModule.msm"
+        "OutputFilename" = "8:Debug\\jicmp-x86.msm"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -37,13 +37,21 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:1"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:FALSE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\JicmpMergeModule.msm"
+        "OutputFilename" = "8:Release\\jicmp-x86.msm"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -53,6 +61,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:1"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:FALSE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
     }
     "Deployable"
@@ -110,7 +126,7 @@
         {
         "ModuleSignature" = "8:MergeModule.6500926BC2CF4681857AA4A836B90687"
         "Version" = "8:1.0.0.0"
-        "Title" = "8:JicmpMergeModule"
+        "Title" = "8:jicmp-x86"
         "Subject" = "8:"
         "Author" = "8:The OpenNMS Group, Inc."
         "Keywords" = "8:"
@@ -124,9 +140,9 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_4AB7A60880784B1FACD8A7FA6D1B7FAD"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_25B108C561164380A508D05A08CF82A8"
             {
-            "SourcePath" = "8:..\\win32\\x86\\Debug\\jicmp.dll"
+            "SourcePath" = "8:x86\\Release\\jicmp.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_AC0C35172F9B451FAC3C3218815BDA26"
@@ -144,7 +160,7 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
+            "OutputConfiguration" = "8:Release|Win32"
             "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{B440F1B9-F87B-4574-AF64-60EA1B78CE4A}"
             "ShowKeyOutput" = "11:TRUE"
