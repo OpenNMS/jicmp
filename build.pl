@@ -1,19 +1,47 @@
 #!/usr/bin/env perl
 
-print "ARGS=@ARGV\n";
+use Getopt::Long qw(:config gnu_getopt);
+
+my $help             = 0;
+my $vis_studio       = undef;
+my $jdk_home         = undef;
+
+my $result = GetOptions(
+        "h|help"              => \$help,
+        "j|jdk-home=s"        => \$jdk_home,
+        "v|visual-studio=s"   => \$vis_studio,
+);
+
+if ($help) {
+    usage();
+}
+
+if (not defined $jdk_home) {
+    usage("-j <jdk-home> is required");
+}
+
+if (not defined $vis_studio) {
+    usage("-v <visual-studio-ide-dir> is required");
+}
 
 print "Building Java Code\n";
 mkdir("classes");
-handle_errors_and_exit_on_failure(system("c:\\Program Files\\Java\\jdk1.6.0_30\\bin\\javac", "-d", "classes", "-sourcepath", "src/main/java", "src/main/java/org/opennms/protocols/icmp/IcmpSocket.java"));
+run("$jdk_home\\bin\\javac", "-d", "classes", "-sourcepath", "src/main/java", "src/main/java/org/opennms/protocols/icmp/IcmpSocket.java");
 
 print "Generating JNI Headers\n";
-handle_errors_and_exit_on_failure(system("c:\\Program Files\\Java\\jdk1.6.0_30\\bin\\javah","-classpath", "classes", "org.opennms.protocols.icmp.IcmpSocket"));
+run("$jdk_home\\bin\\javah","-classpath", "classes", "org.opennms.protocols.icmp.IcmpSocket");
 
 print "Building x86 MSM Modules\n";
-handle_errors_and_exit_on_failure(system("c:\\Program Files\\Microsoft Visual Studio 10.0\\Common7\\IDE\\devenv", ".\\win32\\jicmp.sln", "/rebuild", "Release|Win32"));
+run("$vis_studio\\devenv", ".\\win32\\jicmp.sln", "/rebuild", "Release|Win32");
 
 print "Building x64 MSM Modules\n";
-handle_errors_and_exit_on_failure(system("c:\\Program Files\\Microsoft Visual Studio 10.0\\Common7\\IDE\\devenv", ".\\win32\\jicmp.sln", "/rebuild", "Release|x64"));
+run("$vis_studio\\devenv", ".\\win32\\jicmp.sln", "/rebuild", "Release|x64");
+
+sub run {
+    print(join(" ", @_));print("...");
+    handle_errors_and_exit_on_failure(system(@_));
+    print("done.\n");
+}
 
 
 sub handle_errors {
@@ -38,6 +66,23 @@ sub handle_errors_and_exit_on_failure {
     }
 }
 
+sub usage {
+	my $error = shift;
+
+	print <<END;
+usage: $0 [-h] -j <jdk-home> -v visual_studio
+
+	-h            : print this help
+	-j            : Home Directory of JDK
+	-v            : IDE directory for Visual Studio
+END
+
+	if (defined $error) {
+		print "ERROR: $error\n\n";
+	}
+
+	exit 1;
+}
 
 sub error {
     print "[ERROR] " . join(' ', @_) . "\n";
