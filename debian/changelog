@@ -1,7 +1,7 @@
 jicmp (1.2.1-1) unstable; urgency=medium
 
- * Updated to latest version, with minor configuration fixes for
-   some platforms.
+  * Updated to latest version, with minor configuration fixes for
+    some platforms.
 
  -- Benjamin Reed <ranger@opennms.org>  Fri, 29 Jul 2011 14:26:00 -0500
 
