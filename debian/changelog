@@ -1,3 +1,11 @@
+jicmp (1.3.0-1) unstable; urgency=low
+
+  * Update to the latest version
+  * Migrate to modern 3.0 source package
+  * Allow building with openjdk
+
+ -- Alex Bennée <Alex.Bennee@cambridgebroadband.com>  Wed, 08 Feb 2012 16:19:58 +0000
+
 jicmp (1.2.1-1) unstable; urgency=medium
 
   * Updated to latest version, with minor configuration fixes for
