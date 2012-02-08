@@ -1,6 +1,3 @@
-[submodule "debian"]
-	path = debian
-	url = git://opennms.git.sourceforge.net/gitroot/opennms/debian-jicmp
 [submodule "m4"]
 	path = m4
 	url = git://opennms.git.sourceforge.net/gitroot/opennms/autotools
