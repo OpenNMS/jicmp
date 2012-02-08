@@ -1,0 +1,33 @@
+From 193620ada1c8e5fc9bf637308f74bb8a9d816418 Mon Sep 17 00:00:00 2001
+From: Alex Bennee <ajb@cbnl.com>
+Date: Tue, 24 Jan 2012 17:34:41 +0000
+Subject: [PATCH 2/4] Migrate to a 3.0 package
+
+---
+ rules  |    1 -
+ source |    1 +
+ 2 files changed, 1 insertions(+), 1 deletions(-)
+ create mode 100644 source
+
+diff --git a/rules b/rules
+index 3754751..6f5d00b 100755
+--- a/rules
++++ b/rules
+@@ -2,7 +2,6 @@
+ #export DH_VERBOSE=1
+ DEB_TAR_SRCDIR := jicmp-1.2.2
+ 
+-include /usr/share/cdbs/1/rules/tarball.mk
+ include /usr/share/cdbs/1/class/autotools.mk
+ include /usr/share/cdbs/1/rules/debhelper.mk
+ 
+diff --git a/source b/source
+new file mode 100644
+index 0000000..89ae9db
+--- /dev/null
++++ b/source
+@@ -0,0 +1 @@
++3.0 (native)
+-- 
+1.7.8.3
+

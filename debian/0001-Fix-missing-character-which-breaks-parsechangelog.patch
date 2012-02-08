@@ -1,0 +1,24 @@
+From 5f3f62b0528bca2121783b1d8dd2fccb8d362f72 Mon Sep 17 00:00:00 2001
+From: Alex Bennee <ajb@cbnl.com>
+Date: Tue, 24 Jan 2012 17:23:35 +0000
+Subject: [PATCH 1/4] Fix missing character which breaks parsechangelog
+
+---
+ changelog |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/changelog b/changelog
+index ca0bfe8..a0f7bb9 100644
+--- a/changelog
++++ b/changelog
+@@ -1,6 +1,6 @@
+ jicmp (1.2.1-1) unstable; urgency=medium
+ 
+- * Updated to latest version, with minor configuration fixes for
++  * Updated to latest version, with minor configuration fixes for
+    some platforms.
+ 
+  -- Benjamin Reed <ranger@opennms.org>  Fri, 29 Jul 2011 14:26:00 -0500
+-- 
+1.7.8.3
+

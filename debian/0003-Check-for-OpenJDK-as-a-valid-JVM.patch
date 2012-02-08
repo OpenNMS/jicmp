@@ -1,0 +1,25 @@
+From 5038c98d7ff06633eb7dc445ba581f91e33a42d3 Mon Sep 17 00:00:00 2001
+From: Alex Bennee <ajb@cbnl.com>
+Date: Tue, 24 Jan 2012 17:35:02 +0000
+Subject: [PATCH 3/4] Check for OpenJDK as a valid JVM
+
+---
+ getjava |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/getjava b/getjava
+index f927c16..a5b987e 100755
+--- a/getjava
++++ b/getjava
+@@ -3,7 +3,7 @@
+ # $Id: getjava 6644 2007-06-29 20:47:39Z jgehlbach $
+ 
+ if [ -z "$JAVA_HOME" ]; then
+-    for dir in /usr/lib/jvm/java-6-sun /usr/lib/jvm/java-1.5.0-sun
++    for dir in /usr/lib/jvm/java-6-sun /usr/lib/jvm/java-1.5.0-sun /usr/lib/jvm/java-6-openjdk
+     do
+         if [ -d "$dir" -a -f "$dir/lib/tools.jar" ]; then
+             JAVA_HOME="$dir"
+-- 
+1.7.8.3
+

@@ -1,0 +1,38 @@
+jicmp (1.2.1-1) unstable; urgency=medium
+
+ * Updated to latest version, with minor configuration fixes for
+   some platforms.
+
+ -- Benjamin Reed <ranger@opennms.org>  Fri, 29 Jul 2011 14:26:00 -0500
+
+jicmp (1.2.0-1) unstable; urgency=low
+
+  * New in the 1.2.x series is support for SOCK_DGRAM sockets on OSes
+    that support it.
+
+ -- Benjamin Reed <ranger@opennms.org>  Tue, 03 May 2011 14:01:00 -0500
+
+jicmp (1.0.12-1) unstable; urgency=low
+
+  * updated to new version
+
+ -- Benjamin Reed <ranger@opennms.org>  Thu, 18 Nov 2010 14:53:00 -0500
+
+jicmp (1.0.8-1) unstable; urgency=low
+
+  * updated to new version, incorporated some build modernization from topquark
+
+ -- Benjamin Reed <ranger@opennms.org>  Tue, 15 Apr 2008 12:17:00 -0500
+
+jicmp (1.0.7-1) unstable; urgency=low
+
+  * updated to new version
+
+ -- Benjamin Reed <ranger@opennms.org>  Wed, 13 Feb 2008 16:28:00 -0500
+
+jicmp (1.0-1) unstable; urgency=low
+
+  * Initial release as separately versioned package
+
+ -- Jeff Gehlbach <jeffg@opennms.org>  Sat, 28 Jul 2007 20:32:20 -0400
+
