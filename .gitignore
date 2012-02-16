@@ -35,3 +35,9 @@ stamp-h1
 tests.sh
 tests/*.class
 jicmp.jar
+
+/win32/amd64
+/win32/Debug
+/win32/ipch
+/win32/Release
+/win32/x86
