@@ -56,8 +56,6 @@ ONMS_CHECK_SOCKLEN_T
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 
-AC_DEFINE([HAVE_CONFIG_H])
-
 # should be part of stdlib
 AC_CHECK_FUNC([getenv], AC_DEFINE([HAVE_GETENV], [1], [If present, the getenv function allows us to read environment variables.]))
 
