@@ -110,6 +110,10 @@
 #include "byteswap.h"
 #endif
 
+#ifdef HAVE_WINDOWS_H
+#include <Windows.h>
+#endif
+
 #ifdef HAVE_WINSOCK2_H
 
 # ifdef HAVE_WS2DEF_H
@@ -122,7 +126,7 @@
 #  include <ws2tcpip.h>
 # endif
 
-# include "win32/icmp.h"
+# include "icmp.h"
 # ifndef HAVE_STDINT_H
    typedef u_int in_addr_t;
    typedef u_int64 uint64_t;

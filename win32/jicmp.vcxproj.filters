@@ -4,10 +4,10 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="jicmp.cpp">
+    <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="..\IcmpSocket.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -15,13 +15,25 @@
     <ClInclude Include="AppRes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="jicmp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IcmpSocket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\org_opennms_protocols_icmp_IcmpSocket_Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\org_opennms_protocols_icmp_IcmpSocket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="icmp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

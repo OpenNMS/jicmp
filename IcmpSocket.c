@@ -208,7 +208,7 @@ static onms_socket getIcmpFd(JNIEnv *env, jobject instance)
 	* Recover the value
 	*/
 #ifdef __WIN32__
-	fd_value = (*env)->GetLongField(env, thisFdInstance, fdFdField);
+	fd_value = (SOCKET)(*env)->GetLongField(env, thisFdInstance, fdFdField);
 #else
 	fd_value = (*env)->GetIntField(env, thisFdInstance, fdFdField);
 #endif

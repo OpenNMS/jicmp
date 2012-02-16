@@ -32,7 +32,6 @@ Global
 		{4FDF85F0-88AD-4B72-A796-C4592D5D1FFA}.Debug|x64.ActiveCfg = Debug
 		{4FDF85F0-88AD-4B72-A796-C4592D5D1FFA}.Release|Win32.ActiveCfg = Release
 		{4FDF85F0-88AD-4B72-A796-C4592D5D1FFA}.Release|x64.ActiveCfg = Release
-		{4FDF85F0-88AD-4B72-A796-C4592D5D1FFA}.Release|x64.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
