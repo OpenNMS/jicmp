@@ -32,10 +32,10 @@ print "Generating JNI Headers\n";
 run("$jdk_home\\bin\\javah","-classpath", "classes", "org.opennms.protocols.icmp.IcmpSocket");
 
 print "Building x86 MSM Modules\n";
-run("$vis_studio\\devenv", ".\\win32\\jicmp.sln", "/rebuild", "Release|Win32");
+run("$vis_studio\\devenv", ".\\win32\\jicmp.sln", "-rebuild", "Release|Win32");
 
 print "Building x64 MSM Modules\n";
-run("$vis_studio\\devenv", ".\\win32\\jicmp.sln", "/rebuild", "Release|x64");
+run("$vis_studio\\devenv", ".\\win32\\jicmp.sln", "-rebuild", "Release|x64");
 
 sub run {
     print(join(" ", @_));print("...");
