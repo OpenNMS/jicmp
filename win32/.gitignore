@@ -1,9 +1,11 @@
 !config.h
-amd64
-Debug
-ipch
-Release
-x86
+
+amd64/
+Debug/
+ipch/
+Release/
+x86/
+
 *.opensdf
 *.sdf
 *.suo
