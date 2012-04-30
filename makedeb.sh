@@ -78,7 +78,7 @@ function extraInfo()
 
 function extraInfo2()
 {
-    echo "  http://opennms.git.sourceforge.net/git/gitweb.cgi?p=opennms/opennms;a=shortlog;h=$(commit)"
+    echo "  http://opennms.git.sourceforge.net/git/gitweb.cgi?p=opennms/jicmp;a=shortlog;h=$(commit)"
 }
 
 function version()
