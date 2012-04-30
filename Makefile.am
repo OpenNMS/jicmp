@@ -64,7 +64,7 @@ deploy:
 
 .PHONY: deploy rpm
 
-EXTRA_DIST = ChangeLog solaris/pkginfo $(JAVA_FILES) win32/icmp.h CMakeLists.txt config.h.cmake \
+EXTRA_DIST = ChangeLog solaris/pkginfo $(JAVA_FILES) win32/icmp.h \
 	tests.sh \
 	tests/*.java \
 	m4/* \
