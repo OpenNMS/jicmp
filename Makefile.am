@@ -78,7 +78,7 @@ EXTRA_DIST = ChangeLog $(JAVA_FILES) win32/icmp.h \
 	solaris/README \
 	solaris/pkginfo* \
 	solaris/Makefile \
-	solaris/prototype.* \
+	solaris/prototype.*
 
 
 if MAKE_RPMS
