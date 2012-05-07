@@ -64,7 +64,7 @@ deploy:
 
 .PHONY: deploy rpm
 
-EXTRA_DIST = ChangeLog solaris/pkginfo $(JAVA_FILES) win32/icmp.h \
+EXTRA_DIST = ChangeLog $(JAVA_FILES) win32/icmp.h \
 	tests.sh \
 	tests/*.java \
 	m4/* \
@@ -74,7 +74,12 @@ EXTRA_DIST = ChangeLog solaris/pkginfo $(JAVA_FILES) win32/icmp.h \
 	debian/copyright \
 	debian/dirs \
 	debian/getjava \
-	debian/rules
+	debian/rules \
+	solaris/README \
+	solaris/pkginfo* \
+	solaris/Makefile \
+	solaris/prototype.* \
+
 
 if MAKE_RPMS
 rpm: @RPM_TARGET@
