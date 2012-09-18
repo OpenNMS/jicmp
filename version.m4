@@ -1,1 +1,1 @@
-m4_define([VERSION_NUMBER],[1.3.1])
+m4_define([VERSION_NUMBER],[1.4.0])
