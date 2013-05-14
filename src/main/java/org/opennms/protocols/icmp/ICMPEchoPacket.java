@@ -75,7 +75,7 @@ public final class ICMPEchoPacket extends ICMPHeader {
 
     /**
      * Padding used to make the packet conform to the defacto unix ping program
-     * (56 bytes).
+     * (56 bytes) or whatever packetsize is sent in
      */
     private byte[] m_pad;
 
@@ -83,12 +83,6 @@ public final class ICMPEchoPacket extends ICMPHeader {
      * The ping rtt (microseconds)
      */
     private long m_rtt;
-
-    /**
-     * This is the amount of padding required to make the ICMP echo request 56
-     * bytes in length. This is just following the available code for ping ;)
-     */
-    private static final int PAD_SIZE = 16;
 
     /**
      * Converts a byte to a long and wraps the value to avoid sign extension.
@@ -130,6 +124,22 @@ public final class ICMPEchoPacket extends ICMPHeader {
      * @see java.lang.System#currentTimeMillis
      */
     public ICMPEchoPacket(long tid) {
+    	this(tid, 64);
+    }
+
+    /**
+     * Creates a new discovery ping packet that can be sent to a remote protocol
+     * stack. The ICMP type is set to an Echo Request. The next sequence in the
+     * ICMPHeader base class is set and the sent time is set to the current
+     * time.
+     * 
+     * @param tid
+     *            The thread id for the packet.
+     * @param packetsize
+     *            The pad size in bytes
+     * @see java.lang.System#currentTimeMillis
+     */
+    public ICMPEchoPacket(long tid, int packetsize) {
         super(ICMPHeader.TYPE_ECHO_REQUEST, (byte) 0);
         setNextSequenceId();
 
@@ -137,14 +147,19 @@ public final class ICMPEchoPacket extends ICMPHeader {
         m_sent = 0;
         m_recv = 0;
         m_tid = tid;
-
-        m_pad = new byte[PAD_SIZE];
-        for (int x = 0; x < NAMED_PAD.length && x < PAD_SIZE; x++)
+        
+        if (packetsize < getMinimumNetworkSize()) {
+        	throw new IllegalArgumentException("Minimum size for a ICMPEchoPacket is " + getMinimumNetworkSize() + " bytes.");
+        }
+        
+        m_pad = new byte[packetsize - getMinimumNetworkSize()];
+        for (int x = 0; x < NAMED_PAD.length && x < m_pad.length; x++)
             m_pad[x] = NAMED_PAD[x];
-        for (int x = NAMED_PAD.length; x < PAD_SIZE; x++)
-            m_pad[x] = (byte) x;
+        for (int x = NAMED_PAD.length; x < m_pad.length; x++)
+            m_pad[x] = (byte) 0;
 
     }
+
 
     /**
      * Creates a new discovery ping packet from the passed buffer.
@@ -153,7 +168,6 @@ public final class ICMPEchoPacket extends ICMPHeader {
      *            The buffer containing a refected ping packet.
      */
     public ICMPEchoPacket(byte[] buf) {
-        m_pad = null; // ensure loadFromBuffer allocates pad
         loadFromBuffer(buf, 0);
     }
 
@@ -227,11 +241,31 @@ public final class ICMPEchoPacket extends ICMPHeader {
     }
 
     /**
-     * Returns the network size for this packet. This is a combination of the
-     * headers size, plus the padding, and the IPHeader size.
+	 * Returns the size of the integer headers in packet 
      */
-    public final static int getNetworkSize() {
-        return (ICMPHeader.getNetworkSize() + 32 + PAD_SIZE);
+    public int getDataSize() {
+        return (getHeaderSize() + 32);
+    }
+
+    /**
+     * Returns the size of the integer headers in the packet plus the required 'OpenNMS!' string.
+     */
+    public int getMinimumNetworkSize() {
+        return (getDataSize() + NAMED_PAD.length);
+    }
+    
+    /**
+     * Useless function with variable packet sizes but preserved for backwards compatability
+     * @return
+     */
+    @Deprecated
+    public static final int getNetworkSize() {
+    	return ICMPHeader.getNetworkSize() + 32 + 16;
+    }
+    
+    
+    public int getPacketSize() {
+    	return getDataSize() + m_pad.length;
     }
 
     /**
@@ -299,8 +333,8 @@ public final class ICMPEchoPacket extends ICMPHeader {
      * 
      */
     public final int loadFromBuffer(byte[] buf, int offset) {
-        if ((buf.length - offset) < getNetworkSize())
-            throw new IndexOutOfBoundsException("Insufficient Data");
+        if ((buf.length - offset) < getMinimumNetworkSize())
+            throw new IndexOutOfBoundsException("Insufficient Data: packet must be at least " + getMinimumNetworkSize() + " bytes long.");
 
         offset = super.loadFromBuffer(buf, offset);
         if (!isEchoReply() && !isEchoRequest())
@@ -330,10 +364,15 @@ public final class ICMPEchoPacket extends ICMPHeader {
             m_rtt |= byteToLong(buf[offset++]);
         }
 
-        if (m_pad == null)
-            m_pad = new byte[PAD_SIZE];
-        for (int x = 0; x < PAD_SIZE; x++)
+        // skip over the header and timestamp data
+        int remainingBytes = buf.length - getDataSize();
+        if (m_pad == null || m_pad.length != remainingBytes) {
+        	m_pad = new byte[remainingBytes];
+        }
+
+        for (int x = 0; x < m_pad.length; x++) {
             m_pad[x] = buf[offset++];
+        }
 
         return offset;
     }
@@ -355,8 +394,9 @@ public final class ICMPEchoPacket extends ICMPHeader {
      * 
      */
     public final int storeToBuffer(byte[] buf, int offset) {
-        if ((buf.length - offset) < getNetworkSize())
-            throw new IndexOutOfBoundsException("Insufficient Buffer Size");
+        if ((buf.length - offset) < getPacketSize()) {
+            throw new IndexOutOfBoundsException("Insufficient Buffer Size.  Need at least " + getPacketSize() + " bytes to store packet.");
+        }
 
         offset = super.storeToBuffer(buf, offset);
 
@@ -384,8 +424,9 @@ public final class ICMPEchoPacket extends ICMPHeader {
             t <<= 8;
         }
 
-        for (int x = 0; x < PAD_SIZE; x++)
+        for (int x = 0; x < m_pad.length; x++) {
             buf[offset++] = m_pad[x];
+        }
 
         return offset;
     }
@@ -397,7 +438,7 @@ public final class ICMPEchoPacket extends ICMPHeader {
      * @return The object as an array of bytes.
      */
     public final byte[] toBytes() {
-        byte[] buf = new byte[getNetworkSize()];
+        byte[] buf = new byte[getPacketSize()];
         storeToBuffer(buf, 0);
         return buf;
     }

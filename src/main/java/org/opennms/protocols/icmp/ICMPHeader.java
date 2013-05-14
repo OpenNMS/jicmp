@@ -528,9 +528,14 @@ public class ICMPHeader extends Object {
      * @return The number of bytes required to read/write an icmp header.
      * 
      */
+    @Deprecated
     public static int getNetworkSize() {
-        return 8;
-    }
+    	return 8;	
+	}
+    
+	public int getHeaderSize() {
+		return 8;
+	}
 
     /**
      * Used to test to see if the header is an echo reply message. If it is an
