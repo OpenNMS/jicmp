@@ -88,7 +88,7 @@ public final class ICMPEchoPacket extends ICMPHeader {
      * This is the amount of padding required to make the ICMP echo request 56
      * bytes in length. This is just following the available code for ping ;)
      */
-    private static int PAD_SIZE = 24;
+    private static final int PAD_SIZE = 16;
 
     /**
      * Converts a byte to a long and wraps the value to avoid sign extension.
@@ -145,37 +145,6 @@ public final class ICMPEchoPacket extends ICMPHeader {
             m_pad[x] = (byte) x;
 
     }
-
-    /**
-     * Creates a new discovery ping packet that can be sent to a remote protocol
-     * stack. The ICMP type is set to an Echo Request. The next sequence in the
-     * ICMPHeader base class is set and the sent time is set to the current
-     * time.
-     * 
-     * @param tid
-     *            The thread id for the packet.
-     * @param packetsize
-     *            The pad size in bytes
-     * @see java.lang.System#currentTimeMillis
-     */
-    public ICMPEchoPacket(long tid, int packetsize) {
-        super(ICMPHeader.TYPE_ECHO_REQUEST, (byte) 0);
-        setNextSequenceId();
-
-        m_rtt = 0;
-        m_sent = 0;
-        m_recv = 0;
-        m_tid = tid;
-        PAD_SIZE=packetsize-32;
-        
-        m_pad = new byte[PAD_SIZE];
-        for (int x = 0; x < NAMED_PAD.length && x < PAD_SIZE; x++)
-            m_pad[x] = NAMED_PAD[x];
-        for (int x = NAMED_PAD.length; x < PAD_SIZE; x++)
-            m_pad[x] = (byte) 0;
-
-    }
-
 
     /**
      * Creates a new discovery ping packet from the passed buffer.
