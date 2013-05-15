@@ -2,6 +2,7 @@ jicmp (1.4.0-1) unstable; urgency=low
 
   * Update to the latest version
   * Build system updates.
+  * Support setting the packet size used in echo requests.
 
  -- Benjamin Reed <ranger@opennms.org>  Tue, 18 Sep 2012 16:33:00 -0400
 
