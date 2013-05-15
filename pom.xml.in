@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opennms</groupId>
   <artifactId>jicmp-api</artifactId>
-  <version>@VERSION@</version>
+  <version>@VERSION@-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>OpenNMS ICMP API</name>
   <build>
