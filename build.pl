@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 
+use File::Spec;
 use Getopt::Long qw(:config gnu_getopt);
 
 my $help             = 0;
@@ -23,6 +24,21 @@ if (not defined $jdk_home) {
 if (not defined $vis_studio) {
     usage("-v <visual-studio-ide-dir> is required");
 }
+
+$jdk_home = File::Spec->canonpath($jdk_home);
+
+my $contents = "";
+print "Updating JAVA_HOME in build files...\n";
+open (FILEIN, "win32/jicmp.vcxproj") or die "unable to read from jicmp.vcxproj: $!";
+while (my $line = <FILEIN>) {
+	$line =~ s,C\:\\Program Files\\Java\\jdk1\.6\.0_30,${jdk_home},g;
+	$contents .= $line;
+}
+close (FILEIN) or die "unable to close jicmp.vcxproj: $!";
+
+open (FILEOUT, '>win32/jicmp.vcxproj') or die "unable to write to jicmp.vcxproj: $!";
+print FILEOUT $contents;
+close (FILEOUT);
 
 print "Building Java Code\n";
 mkdir("classes");
