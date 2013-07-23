@@ -31,8 +31,8 @@ my $contents = "";
 print "Updating JAVA_HOME in build files...\n";
 open (FILEIN, "win32/jicmp.vcxproj") or die "unable to read from jicmp.vcxproj: $!";
 while (my $line = <FILEIN>) {
-	$line =~ s,C\:\\Program Files\\Java\\jdk1\.6\.0_30,${jdk_home},g;
-	$contents .= $line;
+    $line =~ s,C\:\\Program Files\\Java\\jdk1\.6\.0_30,${jdk_home},g;
+    $contents .= $line;
 }
 close (FILEIN) or die "unable to close jicmp.vcxproj: $!";
 
@@ -48,10 +48,10 @@ print "Generating JNI Headers\n";
 run("$jdk_home\\bin\\javah","-classpath", "classes", "org.opennms.protocols.icmp.IcmpSocket");
 
 print "Building x86 MSM Modules\n";
-run("$vis_studio\\devenv", ".\\win32\\jicmp.sln", "-rebuild", "Release|Win32");
+run("$vis_studio\\devenv", ".\\win32\\jicmp.sln", "/out", "release-win32.out", "/log", "release-win32.log", "-rebuild", "Release|Win32");
 
 print "Building x64 MSM Modules\n";
-run("$vis_studio\\devenv", ".\\win32\\jicmp.sln", "-rebuild", "Release|x64");
+run("$vis_studio\\devenv", ".\\win32\\jicmp.sln", "/out", "release-x64.out", "/log", "release-x64.log", "-rebuild", "Release|x64");
 
 sub run {
     print(join(" ", @_));print("...");
@@ -59,6 +59,22 @@ sub run {
     print("done.\n");
 }
 
+sub print_logfiles {
+    for my $type ('win32', 'x64') {
+        for my $ext ('out', 'log') {
+            my $file = 'release-' . $type . '.' . $ext;
+            if (-e $file) {
+                error($file . " contents:");
+                open (FILEIN, $file);
+                while (my $line = <FILEIN>) {
+                    chomp($line);
+                    error($line);
+                }
+                close (FILEIN);
+            }
+        }
+    }
+}
 
 sub handle_errors {
     my $exit = shift;
@@ -66,14 +82,16 @@ sub handle_errors {
         info("finished successfully");
     } elsif ($exit == -1) {
         error("failed to execute: $!");
+        print_logfiles();
     } elsif ($exit & 127) {
-    error("child died with signal " . ($exit & 127));
+        error("child died with signal " . ($exit & 127));
+        print_logfiles();
     } else {
-    error("child exited with value " . ($exit >> 8));
+        error("child exited with value " . ($exit >> 8));
+        print_logfiles();
     }
     return $exit;
 }
-
 
 sub handle_errors_and_exit_on_failure {
     my $exit = handle_errors(@_);
@@ -83,21 +101,21 @@ sub handle_errors_and_exit_on_failure {
 }
 
 sub usage {
-	my $error = shift;
+    my $error = shift;
 
-	print <<END;
+    print <<END;
 usage: $0 [-h] -j <jdk-home> -v visual_studio
 
-	-h            : print this help
-	-j            : Home Directory of JDK
-	-v            : IDE directory for Visual Studio
+    -h            : print this help
+    -j            : Home Directory of JDK
+    -v            : IDE directory for Visual Studio
 END
 
-	if (defined $error) {
-		print "ERROR: $error\n\n";
-	}
+    if (defined $error) {
+        print "ERROR: $error\n\n";
+    }
 
-	exit 1;
+    exit 1;
 }
 
 sub error {
