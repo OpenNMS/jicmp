@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+use Cwd qw(getcwd);
+use File::Path qw(make_path);
 use File::Spec;
 use Getopt::Long qw(:config gnu_getopt);
 
@@ -26,6 +28,8 @@ if (not defined $vis_studio) {
 }
 
 $jdk_home = File::Spec->canonpath($jdk_home);
+$ENV{'TEMP'} = File::Spec->canonpath(File::Spec->catdir(getcwd()), 'target', 'msbuild');
+make_path($ENV{'TEMP'});
 
 my $contents = "";
 print "Updating JAVA_HOME in build files...\n";
