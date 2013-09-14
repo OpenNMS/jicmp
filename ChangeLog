@@ -1,3 +1,12 @@
+1.4.2
+-----
+* Fix for Solaris socket link issue.
+* Build system fixes for Windows automated build.
+
+1.4.1
+-----
+* More Win32 build fixes.
+
 1.4.0
 -----
 * More build system updates.
