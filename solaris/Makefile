@@ -18,12 +18,12 @@ GENERATED = pkginfo
 package: jicmp.pkg
 
 jicmp.pkg: check_prototype clean clean_source $(TARGET)
-	( cd .. && CC=$(CC) CFLAGS="$(CFLAGS32)" LDFLAGS="$(LDFLAGS32)" ./configure --with-jvm-arch=32 --prefix="$(TARGET)" --libdir="$(LIB)/32" LIBS="-lsocket -lnsl" "$(ARGS32)" )
+	( cd .. && CC=$(CC) CFLAGS="$(CFLAGS32)" LDFLAGS="$(LDFLAGS32)" ./configure --with-jvm-arch=32 --prefix="$(TARGET)" --libdir="$(LIB)/32" "$(ARGS32)" )
 	( cd .. && make install )
 
 	( cd .. && make distclean )
 
-	( cd .. && CC=$(CC) CFLAGS="$(CFLAGS64)" LDFLAGS="$(LDFLAGS64)" ./configure --with-jvm-arch=64 --prefix="$(TARGET)" --libdir="$(LIB)/64" LIBS="-lsocket -lnsl" "$(ARGS64)" )
+	( cd .. && CC=$(CC) CFLAGS="$(CFLAGS64)" LDFLAGS="$(LDFLAGS64)" ./configure --with-jvm-arch=64 --prefix="$(TARGET)" --libdir="$(LIB)/64" "$(ARGS64)" )
 	( cd .. && make install )
 
 	( cd .. && make solaris/pkginfo )
