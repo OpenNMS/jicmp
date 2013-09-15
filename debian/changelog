@@ -1,3 +1,15 @@
+jicmp (1.4.2-1) unstable; urgency=low
+
+  * Fix socket library detection.
+
+ -- Benjamin Reed <ranger@opennms.org>  Sun, 15 Sep 2013 09:43:00 -0400
+
+jicmp (1.4.1-1) unstable; urgency=low
+
+  * Win32 build fixes.
+
+ -- Benjamin Reed <ranger@opennms.org>  Fri, 17 May 2013 12:42:14 -0400
+
 jicmp (1.4.0-1) unstable; urgency=low
 
   * Update to the latest version
