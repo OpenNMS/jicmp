@@ -293,7 +293,7 @@ public final class ICMPEchoPacket extends ICMPHeader {
         // take care of any stray bytes
         //
         if ((m_pad.length % 2) == 1)
-            summer.add(m_pad[m_pad.length]);
+            summer.add(m_pad[m_pad.length - 1]);
 
         //
         // set the checksum in the header
