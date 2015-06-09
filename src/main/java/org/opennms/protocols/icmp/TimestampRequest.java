@@ -47,9 +47,8 @@ import org.opennms.protocols.ip.OC16ChecksumProducer;
  * can be stored in a buffer to send or loaded from a received buffer. The class
  * is marked final since it is not intended to be extended.
  * 
+ * @author Brian Weaver
  * @version 0.1
- * @author Brian Weaver <weave@oculan.com>
- * 
  */
 public final class TimestampRequest extends ICMPHeader {
     private int m_origStamp;

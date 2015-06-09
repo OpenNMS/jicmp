@@ -15,6 +15,7 @@ aclocal.m4
 autom4te.cache
 build-tree
 classes
+compile
 config.guess
 config.h
 config.h.in
@@ -32,6 +33,7 @@ missing
 pom.xml
 solaris/pkginfo
 stamp-h1
+test-driver
 tests.sh
 tests/*.class
 jicmp.jar

@@ -41,7 +41,7 @@ package org.opennms.protocols.ip;
  * This exception is thrown when the IP version is not supported by the IPHeader
  * class.
  * 
- * @author <a href="mailto:weave@oculan.com">Brian Weaver </a>
+ * @author Brian Weaver
  */
 public class UnknownIPVersionException extends RuntimeException {
     private static final long serialVersionUID = 1L;

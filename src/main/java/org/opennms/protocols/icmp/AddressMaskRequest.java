@@ -45,7 +45,7 @@ import org.opennms.protocols.ip.OC16ChecksumProducer;
  * can be stored in a buffer to send or loaded from a received buffer. The class
  * is marked final since it is not intended to be extended.
  * 
- * @author Brian Weaver <weave@oculan.com>
+ * @author Brian Weaver
  * 
  */
 public final class AddressMaskRequest extends ICMPHeader {

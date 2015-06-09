@@ -48,7 +48,7 @@ import org.opennms.protocols.ip.IPHeader;
  * protocol data. This is enough to hold a UDP header or the first 8 bytes of a
  * TCP header.
  * 
- * @author <a href="mailto:weave@oculan.com">Brian Weaver </a>
+ * @author Brian Weaver
  * 
  */
 public class ErrorMessage extends ICMPHeader {

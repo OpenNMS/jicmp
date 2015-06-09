@@ -49,9 +49,8 @@ import org.opennms.protocols.ip.OC16ChecksumProducer;
  * override the format of the second 4 bytes, the first 4 bytes are fixed by the
  * RFC. The minimum message size for any ICMP message is 8 bytes.
  * 
- * @author Brian Weaver <weave@oculan.com>
+ * @author Brian Weaver
  * @version 0.1
- * 
  */
 public class ICMPHeader extends Object {
     public static final byte TYPE_ECHO_REPLY = (byte) 0;

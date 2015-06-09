@@ -38,7 +38,7 @@ package org.opennms.protocols.ip;
  * Produces a one's compliment 16-bit checksum from data that is "added" to the
  * sum. The producer handles objects from 8-bits to 64-bit values.
  * 
- * @author <a href="mailto:weave@oculan.com">Brian Weaver </a>
+ * @author Brian Weaver
  * 
  */
 public final class OC16ChecksumProducer extends Object {

@@ -45,12 +45,9 @@ import org.opennms.protocols.ip.OC16ChecksumProducer;
 /**
  * The ping packet for discovery
  * 
- * @author <A HREF="mailto:weave@oculan.com">Brian Weaver </A>
- * @author <A HREF="mailto:sowmya@opennms.org">Sowmya </A>
- * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
- * 
- * @version 1.1.1.1
- * 
+ * @author Brian Weaver
+ * @author Sowmya
+ * @author <a href="http://www.opennms.org/">OpenNMS</a>
  */
 public final class ICMPEchoPacket extends ICMPHeader {
     /**

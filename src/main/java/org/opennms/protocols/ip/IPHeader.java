@@ -47,8 +47,7 @@ import java.util.List;
  * For more information on the IP header see the book "TCP/IP Illustrated,
  * Volume 1: The Protocols" by W. Richard Stevens.
  * 
- * @author <a href="mailto:weave@oculan.com">Brian Weaver </a>
- * 
+ * @author Brian Weaver
  */
 public class IPHeader extends Object {
     /**
@@ -273,10 +272,6 @@ public class IPHeader extends Object {
     /**
      * The Option class is used as the base class for any options that are at
      * the end of the IP header.
-     * 
-     * @author <A HREF="mailto:weave@oculan.com">Brian Weaver </A>
-     * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
-     * 
      */
     public abstract static class Option {
         /**
@@ -367,10 +362,6 @@ public class IPHeader extends Object {
      * This class is used to represent the <EM>End-Of-Option</EM> list in the
      * IP header. After this option, the option list is not processed any
      * further.
-     * 
-     * @author <A HREF="mailto:weave@oculan.com">Brian Weaver </A>
-     * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
-     * 
      */
     public static final class EndOfOptions extends Option {
         /**
@@ -414,10 +405,6 @@ public class IPHeader extends Object {
      * This class represents routing options that may be part of an IP header.
      * The route defines a set of IP addresses that a packet may have or should
      * pass though.
-     * 
-     * @author <A HREF="mailto:weave@oculan.com">Brian Weaver </A>
-     * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
-     * 
      */
     public static class RouteOption extends Option {
         /**
@@ -557,10 +544,6 @@ public class IPHeader extends Object {
      * of an IP header. The loose source route defines a set of IP addresses
      * that a packet should pass though. As the packet reaches each address the
      * packet is forwarded to the next element in the route.
-     * 
-     * @author <A HREF="mailto:weave@oculan.com">Brian Weaver </A>
-     * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
-     * 
      */
     public static final class LooseSourceRouteOption extends RouteOption {
         /**
@@ -608,10 +591,6 @@ public class IPHeader extends Object {
      * of an IP header. The strict source route defines a set of IP addresses
      * that a packet must pass though. As the packet reaches each address the
      * packet is forwarded to the next element in the route.
-     * 
-     * @author <A HREF="mailto:weave@oculan.com">Brian Weaver </A>
-     * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
-     * 
      */
     public static final class StrictSourceRouteOption extends RouteOption {
         /**
@@ -659,10 +638,6 @@ public class IPHeader extends Object {
      * header. The strict route record records a set of IP addresses that a
      * packet has passed though. As the packet reaches each address the address
      * is added to the the next element in the route.
-     * 
-     * @author <A HREF="mailto:weave@oculan.com">Brian Weaver </A>
-     * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
-     * 
      */
     public static final class RouteRecordOption extends RouteOption {
         /**
@@ -1399,7 +1374,7 @@ public class IPHeader extends Object {
      *            The 32-bit address
      * 
      * @return The dotted decimal address in the format "xxx.xxx.xxx.xxx" where
-     *         0 <= xxx < 256
+     *         0 &lt;= xxx &lt; 256
      * 
      */
     public static String addressToString(int ipv4Addr) {
@@ -1423,7 +1398,7 @@ public class IPHeader extends Object {
      *            The 4 byte buffer
      * 
      * @return The dotted decimal address in the format "xxx.xxx.xxx.xxx" where
-     *         0 <= xxx < 256
+     *         0 &lt;= xxx &lt; 256
      * 
      * @exception IllegalArgumentException
      *                Thrown if the buffer is not exactly 4 bytes in length.
