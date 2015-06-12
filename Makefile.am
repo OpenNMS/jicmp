@@ -91,6 +91,8 @@ EXTRA_DIST = ChangeLog $(JAVA_FILES) \
 if MAKE_RPMS
 rpm: @RPM_TARGET@
 
+srpm: @SRPM_TARGET@
+
 print_rpm: @RPM_TARGET@
 	@echo $(RPM_TARGET)
 
@@ -102,4 +104,11 @@ $(RPM_TARGET): $(DISTFILES)
 	-mkdir -p `dirname $(RPM_TARGET)`
 	$(RPMBUILD_PROG) --define 'version $(VERSION)' --define 'rel $(RELEASE)' $(RPM_ARGS) $(RPM_TARBALL)
 	@echo "$(RPM_TARGET) created"
+
+$(SRPM_TARGET): $(DISTFILES)
+	${MAKE} dist
+	-mkdir -p $(RPM_DIR)/SRPMS
+	-mkdir -p `dirname $(SRPM_TARGET)`
+	$(RPMBUILD_PROG) --define 'version $(VERSION)' --define 'rel $(RELEASE)' $(SRPM_ARGS) $(RPM_TARBALL)
+	@echo "$(SRPM_TARGET) created"
 endif
