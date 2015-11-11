@@ -55,6 +55,7 @@ Tab Size = 8
 
 #include "IcmpSocket.h"
 #include <jni.h>
+#include <limits.h>
 
 #ifdef IP_MAXPACKET
 #define MAX_PACKET IP_MAXPACKET
@@ -468,6 +469,34 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 		throwError(env, "java/net/SocketException", errBuf);
 		return;
 	}
+
+	// Request a larger buffer size
+	int rcvbuff = INT_MAX;
+	if(setsockopt(icmp_fd, SOL_SOCKET, SO_RCVBUF, &rcvbuff, sizeof(rcvbuff)))
+	{
+		char    errBuf[128];    /* for exceptions */
+		int     savedErrno  = errno;
+		snprintf(errBuf, sizeof(errBuf), "Failed to set receive buffer size (%d, %s)", savedErrno, strerror(savedErrno));
+		throwError(env, "java/net/SocketException", errBuf);
+		return;
+	}
+
+#if HAVE_GETENV
+	if (getenv ("JICMP_DEBUG") != NULL)
+	{
+		int actual_rcvbuff = -1;
+		int len = sizeof(actual_rcvbuff);
+		if(getsockopt(icmp_fd, SOL_SOCKET, SO_RCVBUF, &actual_rcvbuff, &len))
+		{
+			char    errBuf[128];    /* for exceptions */
+			int     savedErrno  = errno;
+			snprintf(errBuf, sizeof(errBuf), "Failed to get receive buffer size (%d, %s)", savedErrno, strerror(savedErrno));
+			throwError(env, "java/net/SocketException", errBuf);
+			return;
+		}
+		printf("JICMP: Actual receive buffer size: %d\n", actual_rcvbuff);
+	}
+#endif
 
 	setIcmpFd(env, instance, icmp_fd);
 	return;
