@@ -136,6 +136,39 @@ unsigned short checksum(register unsigned short *p, register int sz)
 }
 
 /**
+* This method is used to retrieve the value of the pinger ID
+* from the IcmpSocket instance.
+*/
+static int getPingerId(JNIEnv *env, jobject instance)
+{
+        jclass  thisClass = NULL;
+
+        jfieldID thisIdField = NULL;
+
+	int pingerId = 0;
+
+        // Find the class that describes ourself.
+	thisClass = (*env)->GetObjectClass(env, instance);
+	if(thisClass == NULL)
+		goto end_getid;
+
+	// Grab a reference to the field that stores the id
+	thisIdField = (*env)->GetFieldID(env, thisClass, "m_pingerId", "I");
+	if(thisIdField == NULL || (*env)->ExceptionOccurred(env) != NULL)
+		goto end_getid;
+
+	// We're done with the reference to the class
+	(*env)->DeleteLocalRef(env, thisClass);
+	thisClass = NULL;
+
+	// Grab the value
+	pingerId = (*env)->GetIntField(env, instance, thisIdField);
+
+end_getid:
+	return pingerId;
+}
+
+/**
 * This method is used to lookup the instances java.io.FileDescriptor
 * object and it's internal integer descriptor. This hidden integer
 * is used to store the opened ICMP socket handle that was
@@ -453,10 +486,12 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 		return;
 	}
 
+	char useDgramSocket = 0;
 #if HAVE_GETENV
 	if (getenv ("JICMP_USE_SOCK_DGRAM") != NULL) {
+		useDgramSocket = 1;
 		sock_type = SOCK_DGRAM;
-   }
+	}
 #endif
 	icmp_fd = socket(AF_INET, sock_type, proto->p_proto);
 
@@ -467,6 +502,25 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 		snprintf(errBuf, sizeof(errBuf), "System error creating ICMP socket (%d, %s)", savedErrno, strerror(savedErrno));
 		throwError(env, "java/net/SocketException", errBuf);
 		return;
+	}
+
+	if (useDgramSocket) {
+		// When using a diagram socket on Linux, the ID in the ICMP Echo Request header
+		// is replaced with the source port. In order to generate packets with the
+		// correct ID we need to bind the socket to this port.
+
+		struct sockaddr_in source_address;
+		memset(&source_address, 0, sizeof(struct sockaddr_in));
+		source_address.sin_family = AF_INET;
+		source_address.sin_port = htons(getPingerId(env, instance));
+
+		if(bind(icmp_fd, (struct sockaddr *)&source_address, sizeof(struct sockaddr))) {
+			char	errBuf[128];	/* for exceptions */
+			int	savedErrno  = errno;
+			snprintf(errBuf, sizeof(errBuf), "Failed to bind ICMP socket (%d, %s)", savedErrno, strerror(savedErrno));
+			throwError(env, "java/net/SocketException", errBuf);
+			return;
+		}
 	}
 
 	setIcmpFd(env, instance, icmp_fd);

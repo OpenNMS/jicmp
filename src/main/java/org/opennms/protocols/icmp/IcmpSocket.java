@@ -73,6 +73,8 @@ public final class IcmpSocket {
     @SuppressWarnings("unused")
     private final FileDescriptor m_rawFd;
 
+    private final int m_pingerId;
+
     /**
      * This method is used to open the initial operating system icmp socket. The
      * descriptor for the socket is stored in the member m_rawFd.
@@ -92,7 +94,7 @@ public final class IcmpSocket {
      *                This exception is thrown if the socket fails to be opened
      *                correctly.
      */
-    public IcmpSocket() throws IOException {
+    public IcmpSocket(int pingerId) throws IOException {
         String property = System.getProperty(PROPERTY_NAME);
         if (property != null) {
             log().debug("System property '" + PROPERTY_NAME + "' set to '" + System.getProperty(PROPERTY_NAME) + ".  Attempting to load " + LIBRARY_NAME + " library from this location.");
@@ -103,6 +105,7 @@ public final class IcmpSocket {
         }
         log().info("Successfully loaded " + LIBRARY_NAME + " library.");
 
+        m_pingerId = pingerId;
         m_rawFd = new FileDescriptor();
         initSocket();
         String osName = System.getProperty("os.name");
