@@ -7,7 +7,12 @@
 .libs
 *.lo
 *.loT
+*.log
 *.la
+*.trs
+.classpath
+.project
+.settings
 target
 Makefile
 Makefile.in

@@ -59,6 +59,7 @@ AC_C_CONST
 
 # should be part of stdlib
 AC_CHECK_FUNC([getenv], AC_DEFINE([HAVE_GETENV], [1], [If present, the getenv function allows us to read environment variables.]))
+AC_CHECK_FUNC([setsockopt], AC_DEFINE([HAVE_SETSOCKOPT], [1], [If present, the OS supports setsockopt.]))
 
 ONMS_CHECK_IP_STRUCT([ip])
 ONMS_CHECK_IP_STRUCT([iphdr])

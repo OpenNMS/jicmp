@@ -136,6 +136,16 @@ public final class IcmpSocket {
     }
 
     /**
+     * This method is used to set the traffic class for the socket. (Essentially,
+     * the QoS flags for the packets sent through this socket.)  This is equivalent
+     * to Java's {@link java.net.Socket#setTrafficClass(int)}.
+     * 
+     * @param tc the traffic class
+     * @throws IOException
+     */
+    public final native void setTrafficClass(final int tc) throws IOException;
+
+    /**
      * This method is used to receive the next ICMP datagram from the operating
      * system. The returned datagram packet's address is set to the sending
      * host's address. The port number is always set to Zero, and the buffer is

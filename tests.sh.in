@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 export JAVA_HOME="@JAVA_HOME@"
 export SOURCEDIR="@top_srcdir@"
@@ -8,5 +8,5 @@ echo DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH"
 mkdir -p "$BUILDDIR/tests"
 for file in "$SOURCEDIR"/tests/*.java; do
 	"$JAVA_HOME/bin/javac" -cp "$BUILDDIR/jicmp.jar" "$file"
-	"$JAVA_HOME/bin/java" -cp "$BUILDDIR/jicmp.jar:$BUILDDIR/tests" `echo "$file" | sed -e 's,^.*/,,' -e 's,.java$,,'`
+	"$JAVA_HOME/bin/java" -Dopennms.library.jicmp=`pwd`/.libs/libjicmp@JNI_LIB_EXTENSION@ -cp "$BUILDDIR/jicmp.jar:$BUILDDIR/tests" `echo "$file" | sed -e 's,^.*/,,' -e 's,.java$,,'`
 done
