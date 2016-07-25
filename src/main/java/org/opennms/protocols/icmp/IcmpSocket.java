@@ -70,7 +70,6 @@ public final class IcmpSocket {
      * 
      * It looks unused, but it is used solely by native code.
      */
-    @SuppressWarnings("unused")
     private final FileDescriptor m_rawFd;
 
     /**
@@ -144,6 +143,14 @@ public final class IcmpSocket {
      * @throws IOException
      */
     public final native void setTrafficClass(final int tc) throws IOException;
+
+    /**
+     * This method is used to set the "Don't Fragment" bit for the socket.
+     * 
+     * @param frag whether to allow fragmentation
+     * @throws IOException
+     */
+    public final native void allowFragmentation(final boolean frag) throws IOException;
 
     /**
      * This method is used to receive the next ICMP datagram from the operating
