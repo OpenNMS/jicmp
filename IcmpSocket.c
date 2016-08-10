@@ -426,7 +426,7 @@ static void throwError(JNIEnv *env, char *exception, char *errorBuffer)
 *
 * Class:     org_opennms_protocols_icmp_IcmpSocket
 * Method:    initSocket
-* Signature: ()V
+* Signature: (S)V
 */
 JNIEXPORT void JNICALL
 Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject instance, jshort id)
@@ -540,14 +540,14 @@ end_settos:
 
 /*
  * Class: org_opennms_protocols_icmp_IcmpSocket
- * Method: allowFragmentation
- * Signature: (B)V;
+ * Method: dontFragment
+ * Signature: ()V;
  */
 JNIEXPORT void JNICALL
-Java_org_opennms_protocols_icmp_IcmpSocket_allowFragmentation (JNIEnv *env, jobject instance, jboolean dofragment)
+Java_org_opennms_protocols_icmp_IcmpSocket_dontFragment (JNIEnv *env, jobject instance)
 {
 	int iRC;
-	int dontfragment = dofragment == JNI_TRUE? 0 : 1;
+	int dontfragment = 1;
 
 	/* Get the current file descriptor */
 	onms_socket fd_value = getIcmpFd(env, instance);

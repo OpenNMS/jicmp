@@ -51,7 +51,7 @@ public class TestInitialization {
 
                 System.err.println("Sending packet\n");
                 socket.setTrafficClass(46); // expedited forwarding
-                socket.allowFragmentation(true);
+                socket.dontFragment();
                 socket.send(packet);
 
                 Thread.sleep(1000);
