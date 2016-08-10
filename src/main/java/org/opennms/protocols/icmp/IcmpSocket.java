@@ -75,23 +75,23 @@ public final class IcmpSocket {
     /**
      * This method is used to open the initial operating system icmp socket. The
      * descriptor for the socket is stored in the member m_rawFd.
+     * @param id 
      * 
      * @throws java.io.IOException
      *             This is thrown if an error occurs opening the ICMP socket.
      */
-    private native void initSocket() throws IOException;
+    private native void initSocket(final short id) throws IOException;
 
     /**
      * Constructs a new socket that is able to send and receive ICMP messages.
      * The newly constructed socket will receive all ICMP messages directed at
      * the local machine. The application must be prepared to handle any and
      * discard any non-interesting ICMP messages.
-     * 
      * @exception java.io.IOException
      *                This exception is thrown if the socket fails to be opened
      *                correctly.
      */
-    public IcmpSocket() throws IOException {
+    public IcmpSocket(final short id) throws IOException {
         String property = System.getProperty(PROPERTY_NAME);
         if (property != null) {
             log().debug("System property '" + PROPERTY_NAME + "' set to '" + System.getProperty(PROPERTY_NAME) + ".  Attempting to load " + LIBRARY_NAME + " library from this location.");
@@ -103,7 +103,7 @@ public final class IcmpSocket {
         log().info("Successfully loaded " + LIBRARY_NAME + " library.");
 
         m_rawFd = new FileDescriptor();
-        initSocket();
+        initSocket(id);
         String osName = System.getProperty("os.name");
         if (osName != null && osName.toLowerCase().startsWith("windows")) {
         	// Windows complains if you receive before sending a packet

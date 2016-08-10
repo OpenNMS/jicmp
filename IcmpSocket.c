@@ -429,11 +429,10 @@ static void throwError(JNIEnv *env, char *exception, char *errorBuffer)
 * Signature: ()V
 */
 JNIEXPORT void JNICALL
-Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject instance)
+Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject instance, jshort id)
 {
 	struct protoent *proto;
 	onms_socket icmp_fd = INVALID_SOCKET;
-	int sock_type = SOCK_RAW;
 #ifdef __WIN32__
 	int result;
 	WSADATA info;
@@ -457,23 +456,40 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 		return;
 	}
 
-#if HAVE_GETENV
-	if (getenv ("JICMP_USE_SOCK_DGRAM") != NULL) {
-		sock_type = SOCK_DGRAM;
-   }
-#endif
-	icmp_fd = socket(AF_INET, sock_type, proto->p_proto);
+	icmp_fd = socket(AF_INET, SOCK_DGRAM, proto->p_proto);
+	if (icmp_fd == SOCKET_ERROR)
+	{
+		// failed to get a datagram socket, try raw instead
+		icmp_fd = socket(AF_INET, SOCK_RAW, proto->p_proto);
+	}
 
 	if(icmp_fd == SOCKET_ERROR)
 	{
 		char	errBuf[128];	/* for exceptions */
 		int	savedErrno  = errno;
-		snprintf(errBuf, sizeof(errBuf), "System error creating ICMP socket (%d, %s)", savedErrno, strerror(savedErrno));
+		snprintf(errBuf, sizeof(errBuf), "System error creating raw ICMP socket (%d, %s)", savedErrno, strerror(savedErrno));
+		throwError(env, "java/net/SocketException", errBuf);
+		return;
+	}
+
+	struct sockaddr_in source_address;
+	memset(&source_address, 0, sizeof(struct sockaddr_in));
+	source_address.sin_family = AF_INET;
+	source_address.sin_port = htons(id);
+
+	size_t source_address_len = sizeof(struct sockaddr_in);
+
+	if(bind(icmp_fd, (struct sockaddr *)&source_address, source_address_len) == SOCKET_ERROR)
+	{
+		char	errBuf[128];	/* for exceptions */
+		int	savedErrno  = errno;
+		snprintf(errBuf, sizeof(errBuf), "System error binding ICMP socket to ID %d (%d, %s)", id, savedErrno, strerror(savedErrno));
 		throwError(env, "java/net/SocketException", errBuf);
 		return;
 	}
 
 	setIcmpFd(env, instance, icmp_fd);
+
 	return;
 }
 

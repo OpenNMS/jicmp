@@ -9,7 +9,10 @@ public class TestInitialization {
 
     public static void main(final String[] args) {
         try {
-            final IcmpSocket socket = new IcmpSocket();
+            int id = (int)(Math.random()*Short.MAX_VALUE);
+            long threadId = (long)(Math.random()*Integer.MAX_VALUE);
+
+            final IcmpSocket socket = new IcmpSocket((short)id);
 
             Runnable r = new Runnable() {
                 public void run() {
@@ -39,14 +42,12 @@ public class TestInitialization {
             Thread receiver = new Thread(r);
             receiver.start();
 
-            int id = (int)(Math.random()*Short.MAX_VALUE);
-            long threadId = (long)(Math.random()*Integer.MAX_VALUE);
-
+            System.err.println("id=" + id + ", threadId=" + threadId);
             for(int seqNum = 0; seqNum < 10; seqNum++) {
                 ICMPEchoPacket request = new ICMPEchoPacket(threadId);
 
                 byte[] bytes = request.toBytes();
-                DatagramPacket packet = new DatagramPacket(bytes, 0, bytes.length, InetAddress.getByName("127.0.0.1"), 0);
+                DatagramPacket packet = new DatagramPacket(bytes, 0, bytes.length, InetAddress.getByName("127.0.0.1"), id);
 
                 System.err.println("Sending packet\n");
                 socket.setTrafficClass(46); // expedited forwarding

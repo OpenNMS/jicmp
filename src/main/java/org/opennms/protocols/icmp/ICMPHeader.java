@@ -40,6 +40,7 @@ package org.opennms.protocols.icmp;
 
 import java.util.Date;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.opennms.protocols.ip.OC16ChecksumProducer;
 
@@ -162,7 +163,7 @@ public class ICMPHeader extends Object {
         if (sm_seq == 0) {
             Date d = new Date();
             Random r = new Random(d.getTime());
-            sm_seq = (short) (r.nextInt());
+            sm_seq = (short) r.nextInt(Short.MAX_VALUE/2);
         }
         return ++sm_seq;
     }
