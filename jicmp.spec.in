@@ -29,7 +29,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildRequires: gcc, %{jdk_dep}
 
 %description
-FIXME: better description  :)
+Java interface to ICMP (ping).
 
 %prep
 %setup -n %{name}-%{version}
@@ -37,6 +37,12 @@ FIXME: better description  :)
 %build
 %configure %{arch_arg}
 make
+
+OPENNMS_TEST=$(hostname | grep -c internal.opennms.com)
+if [ $OPENNMS_TEST -eq 1 ]; then
+	echo "WARNING: you will need to run 'sysctl -w net.ipv4.ping_group_range=\"0 429496729\"' for this to pass."
+	make check
+fi
 
 %install
 %makeinstall
