@@ -38,8 +38,7 @@ Java interface to ICMP (ping).
 %configure %{arch_arg}
 make
 
-OPENNMS_TEST=$(hostname | grep -c internal.opennms.com)
-if [ $OPENNMS_TEST -eq 1 ]; then
+if test `hostname | grep -c internal.opennms.com` -eq 1; then
 	echo "WARNING: you will need to run 'sysctl -w net.ipv4.ping_group_range=\"0 429496729\"' for this to pass."
 	make check
 fi
