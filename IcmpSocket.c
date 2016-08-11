@@ -93,6 +93,14 @@ int gettimeofday (struct timeval *tv, void* tz)
 #define IP_MTU_DISCOVER 10
 #endif
 
+#if defined(IP_MTU_DISCOVER)
+  // Linux
+# define ONMS_DONTFRAGMENT IP_MTU_DISCOVER
+#elif defined(IP_DF)
+  // BSD
+# define ONMS_DONTFRAGMENT IP_DF
+#endif
+
 /**
 * This routine is used to quickly compute the
 * checksum for a particular buffer. The checksum
@@ -517,7 +525,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_setTrafficClass (JNIEnv *env, jobject
 	}
 
 #ifndef HAVE_SETSOCKOPT
-	throwError(env, "java/io/IOException", "Invalid Socket Descriptor");
+	throwError(env, "java/io/IOException", "setsockopt() unavailable!");
 	goto end_settos;
 #endif
 
@@ -567,7 +575,7 @@ Java_org_opennms_protocols_icmp_IcmpSocket_dontFragment (JNIEnv *env, jobject in
 #endif
 
     /* set the fragment option on the socket */
-    iRC = setsockopt(fd_value, IPPROTO_IP, IP_MTU_DISCOVER, &dontfragment, sizeof(dontfragment));
+    iRC = setsockopt(fd_value, IPPROTO_IP, ONMS_DONTFRAGMENT, &dontfragment, sizeof(dontfragment));
 	if(iRC == SOCKET_ERROR)
 	{
 		/*
