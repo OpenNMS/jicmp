@@ -423,6 +423,20 @@ static void throwError(JNIEnv *env, char *exception, char *errorBuffer)
 }
 
 /*
+* JICMP 1.x backwards-compatible version of the initSocket call.
+*
+* Class:     org_opennms_protocols_icmp_IcmpSocket
+* Method:    initSocket
+* Signature: ()V
+*/
+
+JNIEXPORT void JNICALL
+Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject instance)
+{
+	Java_org_opennms_protocols_icmp_IcmpSocket_initSocketWithId(env, instance, 0);
+}
+
+/*
 * Opens a new raw socket that is set to send
 * and receive the ICMP protocol. The protocol
 * for 'icmp' is looked up using the function
@@ -433,11 +447,11 @@ static void throwError(JNIEnv *env, char *exception, char *errorBuffer)
 * getprotobyname() or the socket() calls fail.
 *
 * Class:     org_opennms_protocols_icmp_IcmpSocket
-* Method:    initSocket
+* Method:    initSocketWithId
 * Signature: (S)V
 */
 JNIEXPORT void JNICALL
-Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject instance, jshort id)
+Java_org_opennms_protocols_icmp_IcmpSocket_initSocketWithId(JNIEnv *env, jobject instance, jshort id)
 {
 	struct protoent *proto;
 	onms_socket icmp_fd = INVALID_SOCKET;
