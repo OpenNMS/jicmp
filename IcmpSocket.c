@@ -423,20 +423,6 @@ static void throwError(JNIEnv *env, char *exception, char *errorBuffer)
 }
 
 /*
-* JICMP 1.x backwards-compatible version of the initSocket call.
-*
-* Class:     org_opennms_protocols_icmp_IcmpSocket
-* Method:    initSocket
-* Signature: ()V
-*/
-
-JNIEXPORT void JNICALL
-Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject instance)
-{
-	Java_org_opennms_protocols_icmp_IcmpSocket_initSocketWithId(env, instance, 0);
-}
-
-/*
 * Opens a new raw socket that is set to send
 * and receive the ICMP protocol. The protocol
 * for 'icmp' is looked up using the function
@@ -447,11 +433,11 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject inst
 * getprotobyname() or the socket() calls fail.
 *
 * Class:     org_opennms_protocols_icmp_IcmpSocket
-* Method:    initSocketWithId
-* Signature: (S)V
+* Method:    initSocket
+* Signature: ()V
 */
 JNIEXPORT void JNICALL
-Java_org_opennms_protocols_icmp_IcmpSocket_initSocketWithId(JNIEnv *env, jobject instance, jshort id)
+Java_org_opennms_protocols_icmp_IcmpSocket_initSocket (JNIEnv *env, jobject instance)
 {
 	struct protoent *proto;
 	onms_socket icmp_fd = INVALID_SOCKET;
@@ -494,25 +480,53 @@ Java_org_opennms_protocols_icmp_IcmpSocket_initSocketWithId(JNIEnv *env, jobject
 		return;
 	}
 
-	struct sockaddr_in source_address;
-	memset(&source_address, 0, sizeof(struct sockaddr_in));
-	source_address.sin_family = AF_INET;
-	source_address.sin_port = htons(id);
-
-	size_t source_address_len = sizeof(struct sockaddr_in);
-
-	if(bind(icmp_fd, (struct sockaddr *)&source_address, source_address_len) == SOCKET_ERROR)
-	{
-		char	errBuf[128];	/* for exceptions */
-		int	savedErrno  = errno;
-		snprintf(errBuf, sizeof(errBuf), "System error binding ICMP socket to ID %d (%d, %s)", id, savedErrno, strerror(savedErrno));
-		throwError(env, "java/net/SocketException", errBuf);
-		return;
-	}
-
 	setIcmpFd(env, instance, icmp_fd);
-
 	return;
+}
+
+
+/*
+* Binds the socket to the ID port.
+*
+* An exception is thrown if the socket is invalid
+* or the bind call fails.
+*
+* Class:     org_opennms_protocols_icmp_IcmpSocket
+* Method:    bindSocket
+* Signature: (S)V
+*/
+JNIEXPORT void JNICALL
+Java_org_opennms_protocols_icmp_IcmpSocket_bindSocket (JNIEnv *env, jobject instance, jshort id)
+{
+	struct sockaddr_in source_address;
+	size_t source_address_len;
+
+    /* Get the current file descriptor */
+    onms_socket fd_value = getIcmpFd(env, instance);
+    if((*env)->ExceptionOccurred(env) != NULL)
+    {
+        goto end_bind; /* jump to end if necessary */
+    }
+    else if(fd_value < 0)
+    {
+        throwError(env, "java/io/IOException", "Invalid Socket Descriptor");
+        goto end_bind;
+    }
+        memset(&source_address, 0, sizeof(struct sockaddr_in));
+        source_address.sin_family = AF_INET;
+        source_address.sin_port = htons(id);
+        source_address_len = sizeof(struct sockaddr_in);
+
+        if(bind(fd_value, (struct sockaddr *)&source_address, source_address_len) == SOCKET_ERROR)
+        {
+                char    errBuf[128];    // for exceptions
+                int     savedErrno  = errno;
+                snprintf(errBuf, sizeof(errBuf), "System error binding ICMP socket to ID %d (%d, %s)", id, savedErrno, strerror(savedErrno));
+                throwError(env, "java/net/SocketException", errBuf);
+                return;
+        }
+end_bind:
+        return;
 }
 
 

@@ -73,15 +73,6 @@ public final class IcmpSocket {
     private final FileDescriptor m_rawFd;
 
     /**
-     * This method is provided for backwards-compatibility at the C level
-     * with JICMP 1.x.
-     * 
-     * @throws java.io.IOException
-     *             This is thrown if an error occurs opening the ICMP socket.
-     */
-    private native void initSocket() throws IOException;
-
-    /**
      * This method is used to open the initial operating system icmp socket. The
      * descriptor for the socket is stored in the member m_rawFd.
      * @param id 
@@ -89,7 +80,17 @@ public final class IcmpSocket {
      * @throws java.io.IOException
      *             This is thrown if an error occurs opening the ICMP socket.
      */
-    private native void initSocketWithId(final short id) throws IOException;
+    private native void initSocket() throws IOException;
+
+    /**
+     * This method is used to bind the socket.  It should be done after {@link #initSocket(short)}
+     * and any {@link #setTrafficClass(int)} or {@link #dontFragment()} calls, but
+     * before {@link #send(DatagramPacket)} or {@link #receive()} is first called.
+     * 
+     * @throws java.io.IOException
+     *             This is thrown if an error occurs binding the ICMP socket.
+     */
+    private native void bindSocket(final short id) throws IOException;
 
     /**
      * Constructs a new socket that is able to send and receive ICMP messages.
@@ -112,7 +113,8 @@ public final class IcmpSocket {
         log().info("Successfully loaded " + LIBRARY_NAME + " library.");
 
         m_rawFd = new FileDescriptor();
-        initSocketWithId(id);
+        initSocket();
+        bindSocket(id);
         String osName = System.getProperty("os.name");
         if (osName != null && osName.toLowerCase().startsWith("windows")) {
         	// Windows complains if you receive before sending a packet
