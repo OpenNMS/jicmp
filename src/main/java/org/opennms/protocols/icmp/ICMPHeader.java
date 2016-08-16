@@ -40,7 +40,6 @@ package org.opennms.protocols.icmp;
 
 import java.util.Date;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.opennms.protocols.ip.OC16ChecksumProducer;
 
