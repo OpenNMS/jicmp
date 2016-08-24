@@ -1,3 +1,9 @@
+jicmp (2.0.0-1) stable; urgency=low
+
+  * Official release of the 2.0.0 codebase.
+
+ -- Benjamin Reed <ranger@opennms.org>  Wed, 24 Aug 2016 09:43:52 -0400
+
 jicmp (2.0.0-0.7) unstable; urgency=low
 
   * Add DSCP and Don't Fragment bit support, plus non-root.
