@@ -38,14 +38,14 @@ git submodule update --init --recursive
 autoreconf -fvi
 ----
 
-.Generate make files using `/usr/lib` as install path and compile JICMP
+.Generate make files using `/usr/local/lib` as install path and compile JICMP
 [source]
 ----
-./configure --prefix=/usr
+./configure
 make
 ----
 
-TIP: If `--prefix` is not set the default `/usr/local` from _autoconf_ is used.
+TIP: If you want to change the install path the `./configure --prefix=/your/custom/path` can be used.
 
 .Install the library on your system, root permissions may required when working as non-root user.
 [source]
