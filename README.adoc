@@ -29,8 +29,7 @@ cd jicmp
 .Initialize and update the git submodule.
 [source]
 ----
-git submodule init
-git submodule update
+git submodule update --init --recursive
 ----
 
 .Update generated configuration files with
