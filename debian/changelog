@@ -1,3 +1,9 @@
+jicmp (2.0.2-1) stable; urgency=low
+
+  * Merged minor updates from JICMP 1.4.6.
+
+ -- Benjamin Reed <ranger@opennms.org>  Fri, 21 Oct 2016 11:23:04 -0400
+
 jicmp (2.0.1-1) stable; urgency=low
 
   * Maven now creates a bundle rather than a jar.

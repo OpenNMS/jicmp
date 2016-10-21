@@ -1,3 +1,20 @@
+2.0.2
+-----
+* Update documentation.
+* Merge 1.4.6 JICMP changes.
+
+2.0.1
+-----
+* Make the maven build create an OSGi bundle instead of a standard jar.
+* Fix Mac OS X Java header search on newer versions.
+
+2.0.0
+-----
+* Add support for setting the DSCP bits on outgoing packets.
+* Add support for setting the "Don't Fragment" bit on outgoing packets.
+* Add API for binding the socket for proper Linux registration. (This allows non-root ICMP with the proper sysctl set.)
+* Always use SOCK_DGRAM for ICMP if available, fall back to SOCK_RAW automatically (no more environment variables).
+
 1.4.6
 -----
 * Minor updates to build system. (Java detection improved.)
