@@ -16,6 +16,12 @@ jicmp (2.0.0-0.7) unstable; urgency=low
 
  -- Benjamin Reed <ranger@opennms.org>  Tue, 16 Aug 2016 12:34:39 -0400
 
+jicmp (1.4.6-1) stable; urgency=low
+
+  * Build system updates.
+
+ -- Benjamin Reed <ranger@opennms.org>  Fri, 21 Oct 2016 11:09:00 -0400
+
 jicmp (1.4.5-1) stable; urgency=low
 
   * Build system cleanups.
