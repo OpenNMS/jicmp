@@ -1,5 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4
 AM_CPPFLAGS = $(JNI_INCLUDES) -I$(top_srcdir) -I$(top_builddir)
+export TAR_OPTIONS = --owner=0 --group=0 --numeric-owner
 
 JAVA_FILES = src/main/java/org/opennms/protocols/icmp/AddressMaskReply.java \
 	src/main/java/org/opennms/protocols/icmp/AddressMaskRequest.java \
