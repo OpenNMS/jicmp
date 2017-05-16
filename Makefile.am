@@ -18,7 +18,7 @@ classdir=classes
 VPATH += $(classdir)
 
 JICMP_SOURCES = byteswap.h IcmpSocket.h IcmpSocket.c
-JICMP_LDFLAGS = -module -avoid-version -no-undefined $(JAVA_SHREXT_COMMAND)
+JICMP_LDFLAGS = -module -avoid-version -no-undefined $(JAVA_SHREXT_COMMAND) $(NOEXECSTACK_LDFLAGS)
 
 if WIN32
 lib_LTLIBRARIES = jicmp.la
