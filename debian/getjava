@@ -3,9 +3,9 @@
 # $Id: getjava 6644 2007-06-29 20:47:39Z jgehlbach $
 
 if [ -z "$JAVA_HOME" ]; then
-    for dir in /usr/lib/jvm/java-6-sun /usr/lib/jvm/java-1.5.0-sun /usr/lib/jvm/java-6-openjdk
+    for dir in /usr/lib/jvm/*5* /usr/lib/jvm/*6* /usr/lib/jvm/*7* /usr/lib/jvm/*
     do
-        if [ -d "$dir" -a -f "$dir/lib/tools.jar" ]; then
+        if [ -d "$dir" ] && [ -f "$dir/lib/tools.jar" ]; then
             JAVA_HOME="$dir"
             break
         fi
