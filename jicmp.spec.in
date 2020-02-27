@@ -2,8 +2,6 @@
 %define version @VERSION@
 %define pkgname @PACKAGE@
 
-%{!?jdk_dep:%define jdk_dep jdk >= 1.5.0-1}
-
 %define _libdir %_prefix/lib
 %define arch_arg --with-jvm-arch=32
 
@@ -26,7 +24,7 @@ Summary: Java interface to ICMP (ping)
 Source: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 
-BuildRequires: gcc, %{jdk_dep}
+BuildRequires: gcc
 
 %description
 Java interface to ICMP (ping).
