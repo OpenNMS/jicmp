@@ -1,3 +1,9 @@
+jicmp (2.0.5-1) stable; urgency=low
+
+  * A few small updates to build on modern releases.
+
+ -- Benjamin Reed <ranger@opennms.org>  Thu, 31 Jan 2019 09:53:19 -0500
+
 jicmp (2.0.4-1) stable; urgency=low
 
   * Build with 'noexecstack' if available and fix 'make dist' on systems
