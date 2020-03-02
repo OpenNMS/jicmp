@@ -232,6 +232,7 @@ jobs:
             git submodule init && git submodule update
             autoreconf -fvi
             VERSION="$(./configure --version | grep 'jicmp configure' | cut -d' ' -f3)"
+            export DEB_TAR_SRCDIR="jicmp-${VERSION}"
             dch --controlmaint --newversion="${VERSION}-0" --urgency=low --distribution='UNRELEASED' "Automated build from CircleCI: https://github.com/OpenNMS/jicmp/commit/${CIRCLE_SHA}"
             dpkg-buildpackage
             mkdir -p ~/artifacts/packages/debian/i386/
@@ -258,6 +259,7 @@ jobs:
             git submodule init && git submodule update
             autoreconf -fvi
             VERSION="$(./configure --version | grep 'jicmp configure' | cut -d' ' -f3)"
+            export DEB_TAR_SRCDIR="jicmp-${VERSION}"
             dch --controlmaint --newversion="${VERSION}-0" --urgency=low --distribution='UNRELEASED' "Automated build from CircleCI: https://github.com/OpenNMS/jicmp/commit/${CIRCLE_SHA}"
             dpkg-buildpackage
             mkdir -p ~/artifacts/packages/debian/x86_64/
