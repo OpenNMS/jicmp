@@ -1,0 +1,401 @@
+version: 2.1
+
+orbs:
+  cloudsmith: cloudsmith/cloudsmith@1.0.3
+  sign-packages: opennms/sign-packages@2.0.0
+
+executors:
+  centos-sign-executor:
+    docker:
+      - image: opennms/build-env:1.8.0.232.b09-3.6.2-b3291
+  debian-sign-executor:
+    docker:
+      - image: opennms/build-env:debian-jdk8-b3572
+  centos-x86-executor:
+    docker:
+      - image: i386/centos:7
+  centos-x64-executor:
+    docker:
+      - image: centos:7
+  debian-x86-executor:
+    docker:
+      - image: i386/debian:stretch
+  debian-x64-executor:
+    docker:
+      - image: debian:stretch
+
+commands:
+  fetch-maven:
+    description: Fetch Maven
+    parameters:
+      maven-version:
+        type: string
+        default: 3.6.3
+    steps:
+      - restore_cache:
+          keys:
+            - maven-{{ .Branch }}-{{ .Revision }}
+            - maven-{{ .Branch }}-
+            - maven-
+      - run:
+          name: download and unpack Maven
+          command: |
+            if [ ! -x ~/maven/bin/mvn ]; then
+              mkdir -p ~/maven
+              export MAVEN_TARBALL="https://downloads.apache.org/maven/maven-3/<< parameters.maven-version >>/binaries/apache-maven-<< parameters.maven-version >>-bin.tar.gz"
+              ( curl -L -o - "$MAVEN_TARBALL" || wget -O - "$MAVEN_TARBALL" ) | \
+                tar --strip-components=1 -C ~/maven -xvzf -
+            fi
+      - save_cache:
+          key: maven-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - maven
+
+  fetch-rpm-dependencies:
+    description: Fetch RPM Dependencies
+    steps:
+      - restore_cache:
+          keys:
+            - yum-{{ .Branch }}-{{ .Revision }}
+            - yum-{{ .Branch }}
+            - yum-
+      - run:
+          name: yum -y install
+          command: yum -y install automake autoconf curl gcc git gnupg2 java-1.8.0-openjdk-devel libtool make rpm-build which
+      - save_cache:
+          key: yum-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - /var/cache/yum
+
+  fetch-debian-dependencies:
+    description: Fetch Debian Dependencies
+    steps:
+      - run:
+          name: install prerequisites
+          command: |
+            echo "deb http://deb.debian.org/debian stretch-backports main" > /etc/apt/sources.list.d/stretch-backports.list
+            apt-get update
+            apt -y -t stretch-backports install apt-transport-https ca-certificates
+      - restore_cache:
+          keys:
+            - apt-{{ .Branch }}-{{ .Revision }}
+            - apt-{{ .Branch }}
+            - apt-
+      - run:
+          name: apt-get -y install
+          command: |
+            apt -y -t stretch-backports install autotools-dev autoconf automake cdbs curl debhelper debianutils devscripts dpkg-dev git software-properties-common openjdk-8-jdk-headless
+      - save_cache:
+          key: apt-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - /var/cache/apt
+
+  do-build:
+    description: Compile JICMP
+    parameters:
+      arch:
+        type: string
+      platform:
+        type: string
+    steps:
+      - run:
+          name: configure and build
+          command: |
+            ./configure
+            make
+            make install DESTDIR="$(pwd -P)/target"
+            mkdir -p ~/"artifacts/<< parameters.platform >>/<< parameters.arch >>/"
+            mv target/usr/local/lib/*jicmp* ~/"artifacts/<< parameters.platform >>/<< parameters.arch >>/"
+      - store_artifacts:
+          path: ~/artifacts/<< parameters.platform >>/<< parameters.arch >>/
+          destination: << parameters.platform >>-<< parameters.arch >>
+
+jobs:
+  build-source:
+    executor: centos-x64-executor
+    steps:
+      - fetch-rpm-dependencies
+      - fetch-maven
+      - checkout
+      - restore_cache:
+          keys:
+            - m2-{{ .Branch }}-{{ .Revision }}
+            - m2-{{ .Branch }}
+            - m2-
+      - run:
+          name: autoconf, configure, make arch-independent
+          command: |
+            git submodule init && git submodule update
+            autoreconf -fvi
+            ./configure
+            make dist
+            ~/maven/bin/mvn install
+            mkdir -p ~/artifacts/{source,java}
+            mv jicmp-*.tar.gz ~/artifacts/source/
+            mv target/*.jar ~/artifacts/java/
+            make clean
+      - save_cache:
+          key: m2-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ~/.m2
+      - store_artifacts:
+          path: ~/artifacts/java/
+          destination: java
+      - store_artifacts:
+          path: ~/artifacts/source/
+          destination: source
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project
+            - artifacts
+
+  build-mac:
+    macos:
+      xcode: 10.1.0
+    steps:
+      - fetch-maven
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - do-build:
+          arch: x86_64
+          platform: macosx
+
+  build-centos-x86:
+    executor: centos-x86-executor
+    steps:
+      - fetch-rpm-dependencies
+      - fetch-maven
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - do-build:
+          arch: i386
+          platform: linux
+      - run:
+          name: build x86 RPM
+          command: |
+            mkdir -p target/rpm/{SOURCES,BUILD}
+            cp ~/artifacts/source/jicmp-*.tar.gz target/rpm/SOURCES/
+            rpmbuild --define "_topdir $(pwd -P)/target/rpm" --target=i686 -ba jicmp.spec
+            mkdir -p ~/artifacts/packages/rpm/i386/
+            mv target/rpm/RPMS/*/*.rpm ~/artifacts/packages/rpm/i386/
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - artifacts/packages/rpm/i386/
+
+  build-centos-x64:
+    executor: centos-x64-executor
+    steps:
+      - fetch-rpm-dependencies
+      - fetch-maven
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - do-build:
+          arch: x86_64
+          platform: linux
+      - run:
+          name: build x64 RPM
+          command: |
+            mkdir -p target/rpm/{SOURCES,BUILD}
+            cp ~/artifacts/source/jicmp-*.tar.gz target/rpm/SOURCES/
+            rpmbuild --define "_topdir $(pwd -P)/target/rpm" --target=x86_64 -ba jicmp.spec
+            mkdir -p ~/artifacts/packages/rpm/{source,x86_64}/
+            mv target/rpm/SRPMS/*.rpm ~/artifacts/packages/rpm/source/
+            mv target/rpm/RPMS/*/*.rpm ~/artifacts/packages/rpm/x86_64/
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - artifacts/packages/rpm/source/
+            - artifacts/packages/rpm/x86_64/
+      - store_artifacts:
+          path: ~/artifacts/packages/rpm/source/
+          destination: rpm
+
+  build-debian-x86:
+    executor: debian-x86-executor
+    steps:
+      - fetch-debian-dependencies
+      - fetch-maven
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - do-build:
+          arch: i386
+          platform: linux
+      - run:
+          name: build x86 Debian packages
+          command: |
+            git submodule init && git submodule update
+            autoreconf -fvi
+            VERSION="$(./configure --version | grep 'jicmp configure' | cut -d' ' -f3)"
+            dch --controlmaint --newversion="${VERSION}-0" --urgency=low --distribution='UNRELEASED' "Automated build from CircleCI: https://github.com/OpenNMS/jicmp/commit/${CIRCLE_SHA}"
+            dpkg-buildpackage
+            mkdir -p ~/artifacts/packages/debian/i386/
+            mv ../jicmp_* ~/artifacts/packages/debian/i386/
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - artifacts/packages/debian/i386/
+
+  build-debian-x64:
+    executor: debian-x64-executor
+    steps:
+      - fetch-debian-dependencies
+      - fetch-maven
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - do-build:
+          arch: x86_64
+          platform: linux
+      - run:
+          name: build x64 Debian packages
+          command: |
+            git submodule init && git submodule update
+            autoreconf -fvi
+            VERSION="$(./configure --version | grep 'jicmp configure' | cut -d' ' -f3)"
+            dch --controlmaint --newversion="${VERSION}-0" --urgency=low --distribution='UNRELEASED' "Automated build from CircleCI: https://github.com/OpenNMS/jicmp/commit/${CIRCLE_SHA}"
+            dpkg-buildpackage
+            mkdir -p ~/artifacts/packages/debian/x86_64/
+            mv ../jicmp_* ~/artifacts/packages/debian/x86_64/
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - artifacts/packages/debian/x86_64/
+
+  sign-rpms:
+    executor: centos-sign-executor
+    steps:
+      - attach_workspace:
+          at: ~/
+      - sign-packages/install-rpm-dependencies
+      - sign-packages/setup-env:
+          gnupg_home: ~/tmp/gpg
+      - sign-packages/sign-rpms:
+          gnupg_home: ~/tmp/gpg
+          gnupg_key: opennms@opennms.org
+          packages: ~/artifacts/packages/rpm/*/*.rpm
+      - run:
+          name: prepare artifacts
+          command: |
+            mkdir -p ~/artifacts/packages/rpm-signed/
+            cp -f ~/artifacts/packages/rpm/{i386,x86_64}/*.rpm ~/artifacts/packages/rpm-signed/
+      - store_artifacts:
+          path: ~/artifacts/packages/rpm-signed/
+          destination: rpm
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - artifacts/packages/rpm-signed/
+
+  sign-debs:
+    executor: debian-sign-executor
+    steps:
+      - attach_workspace:
+          at: ~/
+      - sign-packages/install-deb-dependencies
+      - sign-packages/setup-env:
+          gnupg_home: ~/tmp/gpg
+      - sign-packages/sign-debs:
+          gnupg_home: ~/tmp/gpg
+          gnupg_key: opennms@opennms.org
+          packages: ~/artifacts/packages/debian/*/*.deb
+      - run:
+          name: prepare artifacts
+          command: |
+            mkdir -p ~/artifacts/packages/debian-signed/
+            cp -f ~/artifacts/packages/debian/i386/* ~/artifacts/packages/debian-signed/
+            cp -f ~/artifacts/packages/debian/x86_64/* ~/artifacts/packages/debian-signed/
+      - store_artifacts:
+          path: ~/artifacts/packages/debian-signed/
+          destination: debian
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - artifacts/packages/debian-signed/
+
+  publish:
+    executor: cloudsmith/default
+    steps:
+      - attach_workspace:
+          at: ~/
+      - cloudsmith/ensure-api-key
+      - cloudsmith/install-cli
+      - cloudsmith/publish:
+          cloudsmith-repository: opennms/develop
+          package-format: rpm
+          package-distribution: el/7
+          package-path: ~/artifacts/packages/rpm-signed/jicmp-2*.i686.rpm
+      - cloudsmith/publish:
+          cloudsmith-repository: opennms/develop
+          package-format: rpm
+          package-distribution: el/7
+          package-path: ~/artifacts/packages/rpm-signed/jicmp-debuginfo-2*.i686.rpm
+      - cloudsmith/publish:
+          cloudsmith-repository: opennms/develop
+          package-format: rpm
+          package-distribution: el/7
+          package-path: ~/artifacts/packages/rpm-signed/jicmp-2*.x86_64.rpm
+      - cloudsmith/publish:
+          cloudsmith-repository: opennms/develop
+          package-format: rpm
+          package-distribution: el/7
+          package-path: ~/artifacts/packages/rpm-signed/jicmp-debuginfo-2*.x86_64.rpm
+      - cloudsmith/publish:
+          cloudsmith-repository: opennms/develop
+          package-format: rpm
+          package-distribution: el/8
+          package-path: ~/artifacts/packages/rpm-signed/jicmp-2*.x86_64.rpm
+      - cloudsmith/publish:
+          cloudsmith-repository: opennms/develop
+          package-format: rpm
+          package-distribution: el/8
+          package-path: ~/artifacts/packages/rpm-signed/jicmp-debuginfo-2*.x86_64.rpm
+      - cloudsmith/publish:
+          cloudsmith-repository: opennms/develop
+          package-format: deb
+          package-distribution: any-distro/any-version
+          package-path: ~/artifacts/packages/debian-signed/jicmp_*_i386.deb
+      - cloudsmith/publish:
+          cloudsmith-repository: opennms/develop
+          package-format: deb
+          package-distribution: any-distro/any-version
+          package-path: ~/artifacts/packages/debian-signed/jicmp_*_amd64.deb
+
+workflows:
+  version: 2.1
+
+  build-workflow:
+    jobs:
+      - build-source
+      - build-debian-x86:
+          requires:
+            - build-source
+      - build-debian-x64:
+          requires:
+            - build-source
+      - build-centos-x86:
+          requires:
+            - build-source
+      - build-centos-x64:
+          requires:
+            - build-source
+      - build-mac:
+          requires:
+            - build-source
+      - sign-debs:
+          requires:
+            - build-debian-x86
+            - build-debian-x64
+      - sign-rpms:
+          requires:
+            - build-centos-x86
+            - build-centos-x64
+      - publish:
+          requires:
+            - sign-debs
+            - sign-rpms
