@@ -406,6 +406,10 @@ workflows:
             - build-centos-x86
             - build-centos-x64
       - publish:
+          filters:
+            branches:
+              only:
+                - master
           requires:
             - sign-debs
             - sign-rpms
