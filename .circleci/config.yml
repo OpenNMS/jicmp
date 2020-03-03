@@ -178,7 +178,7 @@ jobs:
           command: |
             mkdir -p target/rpm/{SOURCES,BUILD}
             cp ~/artifacts/source/jicmp-*.tar.gz target/rpm/SOURCES/
-            rpmbuild --define "_topdir $(pwd -P)/target/rpm" --define "rel 0.${CIRCLE_WORKFLOW_ID}" --target=i686 -ba jicmp.spec
+            rpmbuild --define "_topdir $(pwd -P)/target/rpm" --define "rel 0.${CIRCLE_BUILD_NUM}" --target=i686 -ba jicmp.spec
             mkdir -p ~/artifacts/packages/rpm/i386/
             mv target/rpm/RPMS/*/*.rpm ~/artifacts/packages/rpm/i386/
       - persist_to_workspace:
@@ -202,7 +202,7 @@ jobs:
           command: |
             mkdir -p target/rpm/{SOURCES,BUILD}
             cp ~/artifacts/source/jicmp-*.tar.gz target/rpm/SOURCES/
-            rpmbuild --define "_topdir $(pwd -P)/target/rpm" --define "rel 0.${CIRCLE_WORKFLOW_ID}" --target=x86_64 -ba jicmp.spec
+            rpmbuild --define "_topdir $(pwd -P)/target/rpm" --define "rel 0.${CIRCLE_BUILD_NUM}" --target=x86_64 -ba jicmp.spec
             mkdir -p ~/artifacts/packages/rpm/{source,x86_64}/
             mv target/rpm/SRPMS/*.rpm ~/artifacts/packages/rpm/source/
             mv target/rpm/RPMS/*/*.rpm ~/artifacts/packages/rpm/x86_64/
@@ -233,7 +233,7 @@ jobs:
             autoreconf -fvi
             VERSION="$(./configure --version | grep 'jicmp configure' | cut -d' ' -f3)"
             export DEB_TAR_SRCDIR="jicmp-${VERSION}"
-            dch --controlmaint --newversion="${VERSION}-0.${CIRCLE_WORKFLOW_ID}" --urgency=low --distribution='UNRELEASED' "Automated build from CircleCI: https://github.com/OpenNMS/jicmp/commit/${CIRCLE_SHA}"
+            dch --controlmaint --newversion="${VERSION}-0.${CIRCLE_BUILD_NUM}" --urgency=low --distribution='UNRELEASED' "Automated build from CircleCI: https://github.com/OpenNMS/jicmp/commit/${CIRCLE_SHA}"
             dpkg-buildpackage
             mkdir -p ~/artifacts/packages/debian/i386/
             mv ../jicmp_* ~/artifacts/packages/debian/i386/
@@ -260,7 +260,7 @@ jobs:
             autoreconf -fvi
             VERSION="$(./configure --version | grep 'jicmp configure' | cut -d' ' -f3)"
             export DEB_TAR_SRCDIR="jicmp-${VERSION}"
-            dch --controlmaint --newversion="${VERSION}-0.${CIRCLE_WORKFLOW_ID}" --urgency=low --distribution='UNRELEASED' "Automated build from CircleCI: https://github.com/OpenNMS/jicmp/commit/${CIRCLE_SHA}"
+            dch --controlmaint --newversion="${VERSION}-0.${CIRCLE_BUILD_NUM}" --urgency=low --distribution='UNRELEASED' "Automated build from CircleCI: https://github.com/OpenNMS/jicmp/commit/${CIRCLE_SHA}"
             dpkg-buildpackage
             mkdir -p ~/artifacts/packages/debian/x86_64/
             mv ../jicmp_* ~/artifacts/packages/debian/x86_64/
