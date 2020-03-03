@@ -328,41 +328,49 @@ jobs:
       - cloudsmith/ensure-api-key
       - cloudsmith/install-cli
       - cloudsmith/publish:
+          allow-republish: true
           cloudsmith-repository: opennms/develop
           package-format: rpm
           package-distribution: el/7
           package-path: ~/artifacts/packages/rpm-signed/jicmp-2*.i686.rpm
       - cloudsmith/publish:
+          allow-republish: true
           cloudsmith-repository: opennms/develop
           package-format: rpm
           package-distribution: el/7
           package-path: ~/artifacts/packages/rpm-signed/jicmp-debuginfo-2*.i686.rpm
       - cloudsmith/publish:
+          allow-republish: true
           cloudsmith-repository: opennms/develop
           package-format: rpm
           package-distribution: el/7
           package-path: ~/artifacts/packages/rpm-signed/jicmp-2*.x86_64.rpm
       - cloudsmith/publish:
+          allow-republish: true
           cloudsmith-repository: opennms/develop
           package-format: rpm
           package-distribution: el/7
           package-path: ~/artifacts/packages/rpm-signed/jicmp-debuginfo-2*.x86_64.rpm
       - cloudsmith/publish:
+          allow-republish: true
           cloudsmith-repository: opennms/develop
           package-format: rpm
           package-distribution: el/8
           package-path: ~/artifacts/packages/rpm-signed/jicmp-2*.x86_64.rpm
       - cloudsmith/publish:
+          allow-republish: true
           cloudsmith-repository: opennms/develop
           package-format: rpm
           package-distribution: el/8
           package-path: ~/artifacts/packages/rpm-signed/jicmp-debuginfo-2*.x86_64.rpm
       - cloudsmith/publish:
+          allow-republish: true
           cloudsmith-repository: opennms/develop
           package-format: deb
           package-distribution: any-distro/any-version
           package-path: ~/artifacts/packages/debian-signed/jicmp_*_i386.deb
       - cloudsmith/publish:
+          allow-republish: true
           cloudsmith-repository: opennms/develop
           package-format: deb
           package-distribution: any-distro/any-version
