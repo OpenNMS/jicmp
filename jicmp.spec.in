@@ -1,4 +1,4 @@
-%{!?rel:%define rel 1}
+%{!?rel:%define rel @RELEASE@}
 
 %define version @VERSION@
 %define pkgname @PACKAGE@
