@@ -1,0 +1,27 @@
+= Using JICMP as non-root
+
+JICMP normally uses raw sockets, which requires root access on some operating systems.
+
+== Mac OS X
+
+_Mac OS X_ supports non-root _ICMP_ through the _$$SOCK_DGRAM$$_ interface, which _JICMP_ uses by default if it is found.
+
+== Linux
+
+On Linux, you must set a `sysctl` `OID` to allow ping from non-root users.
+
+To do so, you specify a range of `gid` values that are allowed to send non-root. The examples below use `429496729` because it is the highest possible `gid` value, but it is instead recommended that you specify the `gid` of the user OpenNMS will run as instead. This limits the number of accounts allowed to access raw sockets on the system.
+
+This can be accomplished one-time by running:
+
+[source, shell]
+----
+sysctl -w net.ipv4.ping_group_range="0 429496729"
+----
+
+To permanently configure it on bootup, you can create a configuration file in `/etc/sysctl.d` like so:
+
+[source, shell]
+----
+echo "net.ipv4.ping_group_range=0 429496729" > /etc/sysctl.d/03-non-root-icmp.conf
+----

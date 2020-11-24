@@ -1,0 +1,18 @@
+= Installing JICMP RPMs
+
+== Add the OpenNMS Repository
+
+[source, shell]
+----
+curl -1sLf \
+  'https://packages.opennms.com/public/common/cfg/setup/bash.rpm.sh' \
+  | sudo -E bash
+----
+
+== Install the Package
+
+[source, shell]
+----
+yum install jicmp
+----
+

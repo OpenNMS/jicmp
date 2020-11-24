@@ -35,12 +35,12 @@ endif
 TESTS_ENVIRONMENT = $(LIBTOOL) --mode=execute -dlopen $(top_builddir)/libjicmp.la
 TESTS = tests.sh
 MAINTAINERCLEANFILES = aclocal.m4 config.guess config.sub configure depcomp install-sh ltmain.sh Makefile.in missing config.h.in *~ *.tar.gz
-CLEANFILES = org_*.h jicmp.jar
+CLEANFILES = org_*.h jicmp.jar docs-src/antora.yml public-lock.json
 
 .PHONY: clean-local
 
 clean-local:
-	-rm -rf $(classdir) target java.built *.tar.gz
+	-rm -rf $(classdir) target java.built *.tar.gz public build package-lock.json node_modules
 
 java-classes: java.built
 
@@ -60,6 +60,21 @@ jicmp.jar: java.built
 jardir=$(datadir)/java
 jar_DATA = jicmp.jar
 
+node_modules/.bin/antora:
+	npm i @antora/site-generator-default @antora/cli
+
+DOCS_FILES = docs-src/antora.yml.in \
+	docs-src/modules/*/*.adoc \
+	docs-src/modules/*/pages/*.adoc
+
+build/site.zip: node_modules/.bin/antora docs-src/antora.yml local-site.yml $(DOCS_FILES)
+	node_modules/.bin/antora --stacktrace generate local-site.yml
+
+target/jicmp-api-@VERSION@-javadoc.jar: java.built
+	mvn javadoc:jar
+
+docs: build/site.zip target/jicmp-api-@VERSION@-javadoc.jar
+
 deploy:
 	mvn deploy:deploy-file
 
@@ -76,6 +91,7 @@ EXTRA_DIST = ChangeLog $(JAVA_FILES) \
 	debian/dirs \
 	debian/getjava \
 	debian/rules \
+	$(DOCS_FILES) \
 	solaris/README \
 	solaris/pkginfo* \
 	solaris/Makefile \

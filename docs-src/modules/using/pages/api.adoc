@@ -1,0 +1,3 @@
+= Using JICMP
+
+Java API documentation is available at https://opennms.github.io/jicmp/

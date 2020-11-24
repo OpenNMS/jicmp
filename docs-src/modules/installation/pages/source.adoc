@@ -1,0 +1,38 @@
+= Building JICMP from Source
+
+== Requirements
+
+To be able to build JICMP, you need:
+
+* https://git-scm.com/[git]
+* https://www.gnu.org/software/autoconf/[autoconf]
+* https://www.gnu.org/software/automake/[automake]
+* https://www.gnu.org/software/libtool/[libtool]
+* https://adoptopenjdk.net/[Java JDK] version 1.5 or higher
+
+== Clone the Repository
+
+[source, shell]
+----
+git clone https://github.com/OpenNMS/jicmp.git
+cd jicmp
+git submodule update --init --recursive
+----
+
+== Run Autoconf and Build
+
+TIP: By default, JICMP will install into `/usr/local`. You can change that by adding `--prefix=/other/path` after `./configure`.
+
+[source, shell]
+----
+autoreconf -fvi
+./configure
+make
+----
+
+== Install
+
+[source, shell]
+----
+sudo make install
+----

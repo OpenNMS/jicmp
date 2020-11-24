@@ -1,0 +1,21 @@
+
+:imagesdir: ../assets/images
+
+[[welcome-index]]
+= JICMP Documentation
+
+:data-uri:
+:icons:
+
+[.lead]
+Welcome to the JICMP documentation: information and guides to help you learn about JICMP and start exploring its features.
+
+[TIP]
+====
+Use the left navigation bar to browse the documentation or the links below to access some highlights.
+====
+
+[big]*Need help?*
+
+* talk to us in https://chat.opennms.com/opennms/channels/opennms-development[chat]
+* join our community on https://opennms.discourse.group/latest[Discourse]

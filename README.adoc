@@ -55,7 +55,7 @@ sudo make install
 
 == Using JICMP as non-root
 
-_Mac OS X_ supports non-root _ICMP_ through the _SOCK\_DRGAM_ interface, which _JICMP_ uses by default.
+_Mac OS X_ supports non-root _ICMP_ through the _$$SOCK_DGRAM$$_ interface, which _JICMP_ uses by default.
 
 _Linux_ supports this as well, but you additionally need to set a sysctl _OID_ to allow ping for non-root users.
 
