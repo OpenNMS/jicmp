@@ -1,16 +1,28 @@
 version: 2.1
 
 orbs:
-  cloudsmith: cloudsmith/cloudsmith@1.0.3
-  sign-packages: opennms/sign-packages@2.0.0
+  cloudsmith: cloudsmith/cloudsmith@1.0.5
+  sign-packages: opennms/sign-packages@2.3.0
+
+parameters:
+  debian-version:
+    type: string
+    default: stretch
+  maven-version:
+    type: string
+    default: 3.6.3
+  # 11.5.0 is the last version with JDK8 installed
+  xcode-version:
+    type: string
+    default: 11.5.0
 
 executors:
   centos-sign-executor:
     docker:
-      - image: opennms/build-env:1.8.0.232.b09-3.6.2-b3291
+      - image: opennms/build-env:1.8.0.302.b08-3.6.3-b8090
   debian-sign-executor:
     docker:
-      - image: opennms/build-env:debian-jdk8-b3572
+      - image: opennms/build-env:debian-jdk8-b8242
   centos-x86-executor:
     docker:
       - image: i386/centos:7
@@ -19,10 +31,10 @@ executors:
       - image: centos:7
   debian-x86-executor:
     docker:
-      - image: i386/debian:stretch
+      - image: i386/debian:<< pipeline.parameters.debian-version >>
   debian-x64-executor:
     docker:
-      - image: debian:stretch
+      - image: debian:<< pipeline.parameters.debian-version >>
 
 commands:
   fetch-maven:
@@ -30,7 +42,7 @@ commands:
     parameters:
       maven-version:
         type: string
-        default: 3.6.3
+        default: << pipeline.parameters.maven-version >>
     steps:
       - restore_cache:
           keys:
@@ -53,42 +65,137 @@ commands:
 
   fetch-rpm-dependencies:
     description: Fetch RPM Dependencies
+    parameters:
+      type:
+        type: string
     steps:
-      - restore_cache:
-          keys:
-            - yum-{{ .Branch }}-{{ .Revision }}
-            - yum-{{ .Branch }}
-            - yum-
+      - cache-restore:
+          key: rpm-<< parameters.type >>
+          path: /var/cache/yum
       - run:
-          name: yum -y install
+          name: download packages from yum
+          command: yum -y --downloadonly install automake autoconf curl gcc git gnupg2 java-1.8.0-openjdk-devel libtool make rpm-build which
+      - cache-save:
+          key: rpm-<< parameters.type >>
+          path: /var/cache/yum
+      - run:
+          name: install packages
           command: yum -y install automake autoconf curl gcc git gnupg2 java-1.8.0-openjdk-devel libtool make rpm-build which
-      - save_cache:
-          key: yum-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - /var/cache/yum
 
   fetch-debian-dependencies:
     description: Fetch Debian Dependencies
+    parameters:
+      type:
+        type: string
     steps:
       - run:
           name: install prerequisites
           command: |
-            echo "deb http://deb.debian.org/debian stretch-backports main" > /etc/apt/sources.list.d/stretch-backports.list
-            apt-get update
-            apt -y -t stretch-backports install apt-transport-https ca-certificates
+            # this makes it easier to use in circleci or root images without changing things
+            SUDO="$(command -v sudo || :)"
+            if [ ! -x "$SUDO" ]; then
+              apt -q update
+              apt -y -q --allow-unauthenticated install sudo
+            fi
+
+            sudo apt -q update
+            sudo apt -y -q install gnupg2 software-properties-common
+
+            echo "deb http://deb.debian.org/debian << pipeline.parameters.debian-version >>-backports main" | sudo tee /etc/apt/sources.list.d/<< pipeline.parameters.debian-version >>-backports.list
+            echo "deb http://deb.debian.org/debian-security << pipeline.parameters.debian-version >>/updates main" | sudo tee /etc/apt/sources.list.d/<< pipeline.parameters.debian-version >>-security.list
+            sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138 0E98404D386FA1D9 AA8E81B4331F7F50 112695A0E562B32A
+            sudo apt -q update
+            sudo apt -y -q -t << pipeline.parameters.debian-version >>-backports install apt-transport-https ca-certificates
+      - cache-restore:
+          key: debian-<< parameters.type >>
+          path: /var/cache/apt
+      - run:
+          name: download jdk
+          command: sudo apt -y --download-only -q -t << pipeline.parameters.debian-version >>-backports install openjdk-8-jdk-headless
+      - run:
+          name: download other dependencies
+          command: sudo apt -y --download-only -q install autotools-dev autoconf automake cdbs curl debhelper debianutils devscripts dpkg-dev git software-properties-common
+      - cache-save:
+          key: debian-<< parameters.type >>
+          path: /var/cache/apt
+      - run:
+          name: install jdk
+          command: sudo apt -y -q -t << pipeline.parameters.debian-version >>-backports install openjdk-8-jdk-headless
+      - run:
+          name: install other dependencies
+          command: sudo apt -y -q install autotools-dev autoconf automake cdbs curl debhelper debianutils devscripts dpkg-dev git software-properties-common
+
+  clean-caches:
+    steps:
+      - run:
+          name: Clean Old Cache Objects
+          command: |
+            mkdir -p ~/.m2/repository ~/.npm
+            find ~/.m2/repository ~/.npm -depth -ctime "+7" -type f -exec rm {} \; >/dev/null
+            find ~/.m2/repository ~/.npm -depth -type d -print | while read -r DIR; do
+              rmdir "$DIR" 2>/dev/null || :
+            done
+
+  cache-restore:
+    parameters:
+      key:
+        description: the unique id for this cache
+        type: string
+      path:
+        description: the path to restore to
+        type: string
+    description: "Restore Cache: << parameters.key >>"
+    steps:
       - restore_cache:
           keys:
-            - apt-{{ .Branch }}-{{ .Revision }}
-            - apt-{{ .Branch }}
-            - apt-
+            - cache-<< parameters.key >>-{{ .Branch }}-{{ .Revision }}
+            - cache-<< parameters.key >>-{{ .Branch }}
+            - cache-<< parameters.key >>-
       - run:
-          name: apt-get -y install
+          name: "extract tarball to << parameters.path >>"
           command: |
-            apt -y -t stretch-backports install autotools-dev autoconf automake cdbs curl debhelper debianutils devscripts dpkg-dev git software-properties-common openjdk-8-jdk-headless
+            if [ -e "/tmp/cache-<< parameters.key >>.tar.gz" ]; then
+              mkdir -p "<< parameters.path >>"
+              if [ "$UID" -eq 0 ]; then
+                tar -C "<< parameters.path >>" -xvf "/tmp/cache-<< parameters.key >>.tar.gz"
+              else
+                sudo tar -C "<< parameters.path >>" -xvf "/tmp/cache-<< parameters.key >>.tar.gz"
+                sudo chown -R "$UID" "<< parameters.path >>"
+              fi
+            fi
+
+  cache-save:
+    parameters:
+      key:
+        description: the unique id for this cache
+        type: string
+      path:
+        description: the path to cache
+        type: string
+    description: "Save Cache: << parameters.key >>"
+    steps:
+      - run:
+          name: "create a tarball from << parameters.path >>"
+          command: |
+            if [ -d "<< parameters.path >>" ]; then
+              SAVEDIR="<< parameters.path >>"
+              CACHE_TARBALL="/tmp/cache-<< parameters.key >>.tar.gz"
+
+              if [ "$UID" -eq 0 ]; then
+                rm -f "${CACHE_TARBALL}" || :
+                tar -C "${SAVEDIR}" -cvf "${CACHE_TARBALL}" .
+                chmod a+rw "${CACHE_TARBALL}"
+              else
+                sudo rm -f "${CACHE_TARBALL}" || :
+                sudo tar -C "${SAVEDIR}" -cvf "${CACHE_TARBALL}" .
+                sudo chmod a+rw "${CACHE_TARBALL}"
+                sudo chown "$UID" "${CACHE_TARBALL}"
+              fi
+            fi
       - save_cache:
-          key: apt-{{ .Branch }}-{{ .Revision }}
+          key: cache-<< parameters.key >>-{{ .Branch }}-{{ .Revision }}
           paths:
-            - /var/cache/apt
+            - "/tmp/cache-<< parameters.key >>.tar.gz"
 
   do-build:
     description: Compile JICMP
@@ -98,13 +205,20 @@ commands:
       platform:
         type: string
     steps:
+      - clean-caches
       - run:
           name: configure and build
           command: |
+            export PATH="$HOME/maven/bin:$PATH"
             ./configure
             make
             make install DESTDIR="$(pwd -P)/target"
+      - run:
+          name: save artifacts
+          when: always
+          command: |
             mkdir -p ~/"artifacts/<< parameters.platform >>/<< parameters.arch >>/"
+            cp config.log config.status ~/"artifacts/<< parameters.platform >>/<< parameters.arch >>/"
             mv target/usr/local/lib/*jicmp* ~/"artifacts/<< parameters.platform >>/<< parameters.arch >>/"
       - store_artifacts:
           path: ~/artifacts/<< parameters.platform >>/<< parameters.arch >>/
@@ -114,14 +228,14 @@ jobs:
   build-source:
     executor: centos-x64-executor
     steps:
-      - fetch-rpm-dependencies
+      - fetch-rpm-dependencies:
+          type: x64
       - fetch-maven
       - checkout
-      - restore_cache:
-          keys:
-            - m2-{{ .Branch }}-{{ .Revision }}
-            - m2-{{ .Branch }}
-            - m2-
+      - cache-restore:
+          key: maven
+          path: $HOME/.m2
+      - clean-caches
       - run:
           name: autoconf, configure, make arch-independent
           command: |
@@ -134,10 +248,9 @@ jobs:
             mv jicmp-*.tar.gz ~/artifacts/source/
             mv target/*.jar ~/artifacts/java/
             make clean
-      - save_cache:
-          key: m2-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - ~/.m2
+      - cache-save:
+          key: maven
+          path: $HOME/.m2
       - store_artifacts:
           path: ~/artifacts/java/
           destination: java
@@ -152,7 +265,7 @@ jobs:
 
   build-mac:
     macos:
-      xcode: 10.1.0
+      xcode: << pipeline.parameters.xcode-version >>
     steps:
       - fetch-maven
       - checkout
@@ -165,7 +278,8 @@ jobs:
   build-centos-x86:
     executor: centos-x86-executor
     steps:
-      - fetch-rpm-dependencies
+      - fetch-rpm-dependencies:
+          type: x86
       - fetch-maven
       - checkout
       - attach_workspace:
@@ -189,7 +303,8 @@ jobs:
   build-centos-x64:
     executor: centos-x64-executor
     steps:
-      - fetch-rpm-dependencies
+      - fetch-rpm-dependencies:
+          type: x64
       - fetch-maven
       - checkout
       - attach_workspace:
@@ -218,7 +333,8 @@ jobs:
   build-debian-x86:
     executor: debian-x86-executor
     steps:
-      - fetch-debian-dependencies
+      - fetch-debian-dependencies:
+          type: x86
       - fetch-maven
       - checkout
       - attach_workspace:
@@ -245,7 +361,8 @@ jobs:
   build-debian-x64:
     executor: debian-x64-executor
     steps:
-      - fetch-debian-dependencies
+      - fetch-debian-dependencies:
+          type: x64
       - fetch-maven
       - checkout
       - attach_workspace:
@@ -376,12 +493,55 @@ jobs:
           package-distribution: any-distro/any-version
           package-path: ~/artifacts/packages/debian-signed/jicmp_*_amd64.deb
 
+  build-docs:
+    docker:
+      - image: cimg/openjdk:8.0-node
+    steps:
+      - checkout
+      - fetch-maven
+      - attach_workspace:
+          at: ~/
+      - fetch-debian-dependencies:
+          type: docs
+      - cache-restore:
+          key: maven
+          path: $HOME/.m2
+      - cache-restore:
+          key: node
+          path: $HOME/.npm
+      - clean-caches
+      - run:
+          name: Build Documentation
+          command: |
+            make clean
+            ./configure
+            make docs
+            mkdir -p ~/artifacts
+            mv target/*-javadoc.jar ~/artifacts/
+            mv build/site.zip ~/artifacts/
+      - cache-save:
+          key: node
+          path: $HOME/.npm
+      - cache-save:
+          key: maven
+          path: $HOME/.m2
+      - store_artifacts:
+          path: ~/artifacts/
+          destination: /
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - artifacts
+
 workflows:
   version: 2.1
 
   build-workflow:
     jobs:
       - build-source
+      - build-docs:
+          requires:
+            - build-source
       - build-debian-x86:
           requires:
             - build-source
