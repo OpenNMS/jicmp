@@ -63,6 +63,8 @@ commands:
                 sudo tar -C "<< parameters.path >>" -xvzf "/tmp/cache-<< parameters.key >>.tar.gz"
                 sudo chown -R "$UID" "<< parameters.path >>"
               fi
+            else
+              echo "warning: attempting to restore cache << parameters.key >> to << parameters.path >> but no cache file was found"
             fi
 
   cache-save:
@@ -208,12 +210,14 @@ commands:
       - run:
           name: "enumerate artifacts in << parameters.location >>"
           command: |
+            mkdir -p ~/.artifacts
+            chmod 777 ~/.artifacts
             if [ ! -d << parameters.path >> ] || [ "$(find << parameters.path >> -type f | wc -l)" -eq 0 ]; then
               echo "warning: no files found in <<parameters.path >>"
               exit 0
             fi
-            if [ -e ~/.artifacts-<< parameters.location >>.txt ]; then
-              echo "artifact file ~/.artifacts-<< parameters.location >>.txt already exists -- location must be unique"
+            if [ -e ~/.artifacts/<< parameters.location >>.txt ]; then
+              echo "artifact file ~/.artifacts/<< parameters.location >>.txt already exists -- location must be unique"
               exit 1
             fi
             curl \
@@ -226,11 +230,12 @@ commands:
               "https://circleci.com/api/v2/project/gh/OpenNMS/jicmp/${CIRCLE_BUILD_NUM}/artifacts" \
             | grep -o 'https://[^"]*' \
             | grep "/<< parameters.location >>/" \
-            > ~/.artifacts-<< parameters.location >>.txt
+            > ~/.artifacts/<< parameters.location >>.txt
+            cat ~/.artifacts/<< parameters.location >>.txt
       - persist_to_workspace:
           root: ~/
           paths:
-            - .artifacts-<< parameters.location >>.txt
+            - .artifacts/<< parameters.location >>.txt
 
   # always use attach_workspace to root=~ first
   fetch-artifacts:
@@ -244,9 +249,10 @@ commands:
       - run:
           name: "download artifacts for << parameters.location >> to << parameters.path >>"
           command: |
-            mkdir -p << parameters.path >>
+            mkdir -p << parameters.path >> ~/.artifacts
+            chmod 777 << parameters.path >> ~/.artifacts
             cd << parameters.path >>
-            if [ -e ~/.artifacts-<< parameters.location >>.txt ]; then
+            if [ -e ~/.artifacts/<< parameters.location >>.txt ]; then
               while read URL; do
                 echo "- $URL"
                 curl \
@@ -256,9 +262,9 @@ commands:
                   -H "Circle-Token: ${CIRCLE_API_TOKEN}" \
                   "${URL}"
               done \
-                < ~/.artifacts-<< parameters.location >>.txt
+                < ~/.artifacts/<< parameters.location >>.txt
             else
-              echo "artifact file ~/.artifacts-<< parameters.location >>.txt does not exist"
+              echo "artifact file ~/.artifacts/<< parameters.location >>.txt does not exist"
               exit 1
             fi
             cd -
@@ -595,19 +601,48 @@ jobs:
       - cache-save:
           key: node
           path: $HOME/.npm
-      - cache-save:
-          key: maven
-          path: $HOME/.m2
       - save-artifacts:
           path: ~/artifacts
           location: docs
+
+  publish-docs:
+    docker:
+      - image: cimg/openjdk:8.0-node
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - fetch-artifacts:
+          location: docs
+          path: ~/docs
+      - run:
+          name: commit to gh-pages
+          command: |
+            git config user.email "cicd-system@opennms.com"
+            git config user.name "CI/CD System"
+            git fetch
+            git checkout gh-pages
+            git reset --hard origin/gh-pages
+            rm -rf *
+            git clean -fdx
+            unzip ~/docs/jicmp-api*.jar
+            git add -A
+            if [ "$(git diff HEAD | wc -l)" -gt 0 ]; then
+              echo "changes detected; committing update"
+              git commit -m 'build: updated javadoc'
+            fi
+            git push origin gh-pages:gh-pages
 
 workflows:
   version: 2.1
 
   build-workflow:
     jobs:
-      - build-source
+      - build-source:
+          filters:
+            branches:
+              ignore: gh-pages
       - build-docs:
           requires:
             - build-source
@@ -642,3 +677,10 @@ workflows:
           requires:
             - sign-debs
             - sign-rpms
+      - publish-docs:
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - build-docs
