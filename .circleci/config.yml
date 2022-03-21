@@ -37,6 +37,67 @@ executors:
       - image: debian:<< pipeline.parameters.debian-version >>
 
 commands:
+  cache-restore:
+    parameters:
+      key:
+        description: the unique id for this cache
+        type: string
+      path:
+        description: the path to restore to
+        type: string
+    description: "Restore Cache: << parameters.key >>"
+    steps:
+      - restore_cache:
+          keys:
+            - cache-v2-<< parameters.key >>-{{ .Branch }}-{{ .Revision }}
+            - cache-v2-<< parameters.key >>-{{ .Branch }}
+            - cache-v2-<< parameters.key >>-
+      - run:
+          name: "extract tarball to << parameters.path >>"
+          command: |
+            if [ -e "/tmp/cache-<< parameters.key >>.tar.gz" ]; then
+              mkdir -p "<< parameters.path >>"
+              if [ "$UID" -eq 0 ]; then
+                tar -C "<< parameters.path >>" -xvzf "/tmp/cache-<< parameters.key >>.tar.gz"
+              else
+                sudo tar -C "<< parameters.path >>" -xvzf "/tmp/cache-<< parameters.key >>.tar.gz"
+                sudo chown -R "$UID" "<< parameters.path >>"
+              fi
+            fi
+
+  cache-save:
+    parameters:
+      key:
+        description: the unique id for this cache
+        type: string
+      path:
+        description: the path to cache
+        type: string
+    description: "Save Cache: << parameters.key >>"
+    steps:
+      - run:
+          name: "create a tarball from << parameters.path >>"
+          command: |
+            if [ -d "<< parameters.path >>" ]; then
+              SAVEDIR="<< parameters.path >>"
+              CACHE_TARBALL="/tmp/cache-<< parameters.key >>.tar.gz"
+
+              if [ "$UID" -eq 0 ]; then
+                rm -f "${CACHE_TARBALL}" || :
+                tar -C "${SAVEDIR}" -czf "${CACHE_TARBALL}" .
+                chmod a+rw "${CACHE_TARBALL}"
+              else
+                sudo rm -f "${CACHE_TARBALL}" || :
+                sudo tar -C "${SAVEDIR}" -czf "${CACHE_TARBALL}" .
+                sudo chmod a+rw "${CACHE_TARBALL}"
+                sudo chown "$UID" "${CACHE_TARBALL}"
+              fi
+            fi
+      - save_cache:
+          key: cache-v2-<< parameters.key >>-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - "/tmp/cache-<< parameters.key >>.tar.gz"
+
   fetch-maven:
     description: Fetch Maven
     parameters:
@@ -44,24 +105,21 @@ commands:
         type: string
         default: << pipeline.parameters.maven-version >>
     steps:
-      - restore_cache:
-          keys:
-            - maven-{{ .Branch }}-{{ .Revision }}
-            - maven-{{ .Branch }}-
-            - maven-
+      - cache-restore:
+          key: maven-bin
+          path: ~/maven
       - run:
           name: download and unpack Maven
           command: |
             if [ ! -x ~/maven/bin/mvn ]; then
               mkdir -p ~/maven
               export MAVEN_TARBALL="https://downloads.apache.org/maven/maven-3/<< parameters.maven-version >>/binaries/apache-maven-<< parameters.maven-version >>-bin.tar.gz"
-              ( curl -L -o - "$MAVEN_TARBALL" || wget -O - "$MAVEN_TARBALL" ) | \
+              ( curl -sS -L -o - "$MAVEN_TARBALL" || wget --no-verbose -O - "$MAVEN_TARBALL" ) | \
                 tar --strip-components=1 -C ~/maven -xvzf -
             fi
-      - save_cache:
-          key: maven-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - maven
+      - cache-save:
+          key: maven-bin
+          path: ~/maven
 
   fetch-rpm-dependencies:
     description: Fetch RPM Dependencies
@@ -73,13 +131,13 @@ commands:
           key: rpm-<< parameters.type >>
           path: /var/cache/yum
       - run:
-          name: download packages from yum
+          name: download RPM packages
           command: yum -y --downloadonly install automake autoconf curl gcc git gnupg2 java-1.8.0-openjdk-devel libtool make rpm-build which
       - cache-save:
           key: rpm-<< parameters.type >>
           path: /var/cache/yum
       - run:
-          name: install packages
+          name: install RPM packages
           command: yum -y install automake autoconf curl gcc git gnupg2 java-1.8.0-openjdk-devel libtool make rpm-build which
 
   fetch-debian-dependencies:
@@ -128,7 +186,7 @@ commands:
   clean-caches:
     steps:
       - run:
-          name: Clean Old Cache Objects
+          name: clean cache objects in ~/.m2/repository and ~/.npm older than 7 days
           command: |
             mkdir -p ~/.m2/repository ~/.npm
             find ~/.m2/repository ~/.npm -depth -ctime "+7" -type f -exec rm {} \; >/dev/null
@@ -136,74 +194,78 @@ commands:
               rmdir "$DIR" 2>/dev/null || :
             done
 
-  cache-restore:
+  save-artifacts:
+    description: Save Artifacts and Store Artifact Metadata
     parameters:
-      key:
-        description: the unique id for this cache
-        type: string
       path:
-        description: the path to restore to
         type: string
-    description: "Restore Cache: << parameters.key >>"
+      location:
+        type: string
     steps:
-      - restore_cache:
-          keys:
-            - cache-<< parameters.key >>-{{ .Branch }}-{{ .Revision }}
-            - cache-<< parameters.key >>-{{ .Branch }}
-            - cache-<< parameters.key >>-
+      - store_artifacts:
+          path: "<< parameters.path >>/"
+          destination: "<< parameters.location >>"
       - run:
-          name: "extract tarball to << parameters.path >>"
+          name: "enumerate artifacts in << parameters.location >>"
           command: |
-            if [ -e "/tmp/cache-<< parameters.key >>.tar.gz" ]; then
-              mkdir -p "<< parameters.path >>"
-              if [ "$UID" -eq 0 ]; then
-                tar -C "<< parameters.path >>" -xvf "/tmp/cache-<< parameters.key >>.tar.gz"
-              else
-                sudo tar -C "<< parameters.path >>" -xvf "/tmp/cache-<< parameters.key >>.tar.gz"
-                sudo chown -R "$UID" "<< parameters.path >>"
-              fi
+            if [ ! -d << parameters.path >> ] || [ "$(find << parameters.path >> -type f | wc -l)" -eq 0 ]; then
+              echo "warning: no files found in <<parameters.path >>"
+              exit 0
             fi
-
-  cache-save:
-    parameters:
-      key:
-        description: the unique id for this cache
-        type: string
-      path:
-        description: the path to cache
-        type: string
-    description: "Save Cache: << parameters.key >>"
-    steps:
-      - run:
-          name: "create a tarball from << parameters.path >>"
-          command: |
-            if [ -d "<< parameters.path >>" ]; then
-              SAVEDIR="<< parameters.path >>"
-              CACHE_TARBALL="/tmp/cache-<< parameters.key >>.tar.gz"
-
-              if [ "$UID" -eq 0 ]; then
-                rm -f "${CACHE_TARBALL}" || :
-                tar -C "${SAVEDIR}" -cvf "${CACHE_TARBALL}" .
-                chmod a+rw "${CACHE_TARBALL}"
-              else
-                sudo rm -f "${CACHE_TARBALL}" || :
-                sudo tar -C "${SAVEDIR}" -cvf "${CACHE_TARBALL}" .
-                sudo chmod a+rw "${CACHE_TARBALL}"
-                sudo chown "$UID" "${CACHE_TARBALL}"
-              fi
+            if [ -e ~/.artifacts-<< parameters.location >>.txt ]; then
+              echo "artifact file ~/.artifacts-<< parameters.location >>.txt already exists -- location must be unique"
+              exit 1
             fi
-      - save_cache:
-          key: cache-<< parameters.key >>-{{ .Branch }}-{{ .Revision }}
+            curl \
+              -sS \
+              -L \
+              -H "Accept: application/json" \
+              -H "Content-Type: application/json" \
+              -H "Circle-Token: ${CIRCLE_API_TOKEN}" \
+              -X GET \
+              "https://circleci.com/api/v2/project/gh/OpenNMS/jicmp/${CIRCLE_BUILD_NUM}/artifacts" \
+            | grep -o 'https://[^"]*' \
+            | grep "/<< parameters.location >>/" \
+            > ~/.artifacts-<< parameters.location >>.txt
+      - persist_to_workspace:
+          root: ~/
           paths:
-            - "/tmp/cache-<< parameters.key >>.tar.gz"
+            - .artifacts-<< parameters.location >>.txt
+
+  # always use attach_workspace to root=~ first
+  fetch-artifacts:
+    description: Download Artifacts from a Previous Job
+    parameters:
+      path:
+        type: string
+      location:
+        type: string
+    steps:
+      - run:
+          name: "download artifacts for << parameters.location >> to << parameters.path >>"
+          command: |
+            mkdir -p << parameters.path >>
+            cd << parameters.path >>
+            if [ -e ~/.artifacts-<< parameters.location >>.txt ]; then
+              while read URL; do
+                echo "- $URL"
+                curl \
+                  -sS \
+                  -L \
+                  -O \
+                  -H "Circle-Token: ${CIRCLE_API_TOKEN}" \
+                  "${URL}"
+              done \
+                < ~/.artifacts-<< parameters.location >>.txt
+            else
+              echo "artifact file ~/.artifacts-<< parameters.location >>.txt does not exist"
+              exit 1
+            fi
+            cd -
+            (file << parameters.path >>/* | sort -u) || :
 
   do-build:
     description: Compile JICMP
-    parameters:
-      arch:
-        type: string
-      platform:
-        type: string
     steps:
       - clean-caches
       - run:
@@ -213,25 +275,16 @@ commands:
             ./configure
             make
             make install DESTDIR="$(pwd -P)/target"
-      - run:
-          name: save artifacts
-          when: always
-          command: |
-            mkdir -p ~/"artifacts/<< parameters.platform >>/<< parameters.arch >>/"
-            cp config.log config.status ~/"artifacts/<< parameters.platform >>/<< parameters.arch >>/"
-            mv target/usr/local/lib/*jicmp* ~/"artifacts/<< parameters.platform >>/<< parameters.arch >>/"
-      - store_artifacts:
-          path: ~/artifacts/<< parameters.platform >>/<< parameters.arch >>/
-          destination: << parameters.platform >>-<< parameters.arch >>
 
 jobs:
   build-source:
     executor: centos-x64-executor
+    resource_class: small
     steps:
+      - checkout
       - fetch-rpm-dependencies:
           type: x64
       - fetch-maven
-      - checkout
       - cache-restore:
           key: maven
           path: $HOME/.m2
@@ -251,146 +304,161 @@ jobs:
       - cache-save:
           key: maven
           path: $HOME/.m2
-      - store_artifacts:
-          path: ~/artifacts/java/
-          destination: java
-      - store_artifacts:
-          path: ~/artifacts/source/
-          destination: source
+      - save-artifacts:
+          path: ~/artifacts/source
+          location: source
+      - save-artifacts:
+          path: ~/artifacts/java
+          location: java
       - persist_to_workspace:
           root: ~/
           paths:
             - project
-            - artifacts
 
   build-mac:
     macos:
       xcode: << pipeline.parameters.xcode-version >>
     steps:
       - fetch-maven
-      - checkout
       - attach_workspace:
           at: ~/
-      - do-build:
-          arch: x86_64
-          platform: macosx
+      - do-build
+      - run:
+          name: collect mac binaries
+          when: always
+          command: |
+            mkdir -p ~/artifacts/macosx
+            mv target/usr/local/lib/*jicmp* ~/artifacts/macosx/
+      - save-artifacts:
+          path: ~/artifacts/macosx
+          location: macosx
 
   build-centos-x86:
     executor: centos-x86-executor
+    resource_class: small
     steps:
       - fetch-rpm-dependencies:
           type: x86
       - fetch-maven
-      - checkout
       - attach_workspace:
           at: ~/
-      - do-build:
-          arch: i386
-          platform: linux
+      - do-build
+      - run:
+          name: collect i386 linux binaries
+          when: always
+          command: |
+            mkdir -p ~/artifacts/linux-i386
+            mv target/usr/local/lib/*jicmp* ~/artifacts/linux-i386/
+      - fetch-artifacts:
+          path: target/rpm/SOURCES
+          location: source
       - run:
           name: build x86 RPM
           command: |
             mkdir -p target/rpm/{SOURCES,BUILD}
-            cp ~/artifacts/source/jicmp-*.tar.gz target/rpm/SOURCES/
             rpmbuild --define "_topdir $(pwd -P)/target/rpm" --define "rel 0.${CIRCLE_BUILD_NUM}" --target=i686 -ba jicmp.spec
             mkdir -p ~/artifacts/packages/rpm/i386/
             mv target/rpm/RPMS/*/*.rpm ~/artifacts/packages/rpm/i386/
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - artifacts/packages/rpm/i386/
+      - save-artifacts:
+          path: ~/artifacts/linux-i386
+          location: linux-i386
+      - save-artifacts:
+          path: ~/artifacts/packages/rpm/i386
+          location: rpm-x86
 
   build-centos-x64:
     executor: centos-x64-executor
+    resource_class: small
     steps:
       - fetch-rpm-dependencies:
           type: x64
       - fetch-maven
-      - checkout
       - attach_workspace:
           at: ~/
-      - do-build:
-          arch: x86_64
-          platform: linux
+      - do-build
+      - run:
+          name: collect x86_64 linux binaries
+          when: always
+          command: |
+            mkdir -p ~/artifacts/linux-x86_64
+            mv target/usr/local/lib/*jicmp* ~/artifacts/linux-x86_64/
+      - fetch-artifacts:
+          path: target/rpm/SOURCES
+          location: source
       - run:
           name: build x64 RPM
           command: |
             mkdir -p target/rpm/{SOURCES,BUILD}
-            cp ~/artifacts/source/jicmp-*.tar.gz target/rpm/SOURCES/
             rpmbuild --define "_topdir $(pwd -P)/target/rpm" --define "rel 0.${CIRCLE_BUILD_NUM}" --target=x86_64 -ba jicmp.spec
-            mkdir -p ~/artifacts/packages/rpm/{source,x86_64}/
-            mv target/rpm/SRPMS/*.rpm ~/artifacts/packages/rpm/source/
+            mkdir -p ~/artifacts/packages/rpm/{source,x86_64}
+            mv target/rpm/SRPMS/*.rpm  ~/artifacts/packages/rpm/source/
             mv target/rpm/RPMS/*/*.rpm ~/artifacts/packages/rpm/x86_64/
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - artifacts/packages/rpm/source/
-            - artifacts/packages/rpm/x86_64/
-      - store_artifacts:
-          path: ~/artifacts/packages/rpm/source/
-          destination: rpm
+      - save-artifacts:
+          path: ~/artifacts/linux-x86_64
+          location: linux-x86_64
+      - save-artifacts:
+          path: ~/artifacts/packages/rpm/source
+          location: rpm-source
+      - save-artifacts:
+          path: ~/artifacts/packages/rpm/x86_64
+          location: rpm-x64
 
   build-debian-x86:
     executor: debian-x86-executor
+    resource_class: small
     steps:
       - fetch-debian-dependencies:
           type: x86
       - fetch-maven
-      - checkout
       - attach_workspace:
           at: ~/
-      - do-build:
-          arch: i386
-          platform: linux
       - run:
           name: build x86 Debian packages
           command: |
-            git submodule init && git submodule update
-            autoreconf -fvi
             VERSION="$(./configure --version | grep 'jicmp configure' | cut -d' ' -f3)"
             export DEB_TAR_SRCDIR="jicmp-${VERSION}"
             dch --controlmaint --newversion="${VERSION}-0.${CIRCLE_BUILD_NUM}" --urgency=low --distribution='UNRELEASED' "Automated build from CircleCI: https://github.com/OpenNMS/jicmp/commit/${CIRCLE_SHA}"
             dpkg-buildpackage
-            mkdir -p ~/artifacts/packages/debian/i386/
-            mv ../jicmp_* ~/artifacts/packages/debian/i386/
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - artifacts/packages/debian/i386/
+            mkdir -p ~/artifacts/packages/debian/
+            mv ../jicmp_* ~/artifacts/packages/debian/
+      - save-artifacts:
+          path: ~/artifacts/packages/debian
+          location: debian-x86
 
   build-debian-x64:
     executor: debian-x64-executor
+    resource_class: small
     steps:
       - fetch-debian-dependencies:
           type: x64
       - fetch-maven
-      - checkout
       - attach_workspace:
           at: ~/
-      - do-build:
-          arch: x86_64
-          platform: linux
       - run:
           name: build x64 Debian packages
           command: |
-            git submodule init && git submodule update
-            autoreconf -fvi
             VERSION="$(./configure --version | grep 'jicmp configure' | cut -d' ' -f3)"
             export DEB_TAR_SRCDIR="jicmp-${VERSION}"
             dch --controlmaint --newversion="${VERSION}-0.${CIRCLE_BUILD_NUM}" --urgency=low --distribution='UNRELEASED' "Automated build from CircleCI: https://github.com/OpenNMS/jicmp/commit/${CIRCLE_SHA}"
             dpkg-buildpackage
-            mkdir -p ~/artifacts/packages/debian/x86_64/
-            mv ../jicmp_* ~/artifacts/packages/debian/x86_64/
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - artifacts/packages/debian/x86_64/
+            mkdir -p ~/artifacts/packages/debian/
+            mv ../jicmp_* ~/artifacts/packages/debian/
+      - save-artifacts:
+          path: ~/artifacts/packages/debian
+          location: debian-x64
 
   sign-rpms:
     executor: centos-sign-executor
+    resource_class: small
     steps:
       - attach_workspace:
           at: ~/
+      - fetch-artifacts:
+          path: ~/artifacts/packages/rpm/i386
+          location: rpm-x86
+      - fetch-artifacts:
+          path: ~/artifacts/packages/rpm/x86_64
+          location: rpm-x64
       - sign-packages/install-rpm-dependencies
       - sign-packages/setup-env:
           gnupg_home: ~/tmp/gpg
@@ -403,19 +471,22 @@ jobs:
           command: |
             mkdir -p ~/artifacts/packages/rpm-signed/
             cp -f ~/artifacts/packages/rpm/{i386,x86_64}/*.rpm ~/artifacts/packages/rpm-signed/
-      - store_artifacts:
-          path: ~/artifacts/packages/rpm-signed/
-          destination: rpm
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - artifacts/packages/rpm-signed/
+      - save-artifacts:
+          path: ~/artifacts/packages/rpm-signed
+          location: rpm-signed
 
   sign-debs:
     executor: debian-sign-executor
+    resource_class: small
     steps:
       - attach_workspace:
           at: ~/
+      - fetch-artifacts:
+          path: ~/artifacts/packages/debian/i386
+          location: debian-x86
+      - fetch-artifacts:
+          path: ~/artifacts/packages/debian/x86_64
+          location: debian-x64
       - sign-packages/install-deb-dependencies
       - sign-packages/setup-env:
           gnupg_home: ~/tmp/gpg
@@ -429,19 +500,22 @@ jobs:
             mkdir -p ~/artifacts/packages/debian-signed/
             cp -f ~/artifacts/packages/debian/i386/* ~/artifacts/packages/debian-signed/
             cp -f ~/artifacts/packages/debian/x86_64/* ~/artifacts/packages/debian-signed/
-      - store_artifacts:
-          path: ~/artifacts/packages/debian-signed/
-          destination: debian
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - artifacts/packages/debian-signed/
+      - save-artifacts:
+          path: ~/artifacts/packages/debian-signed
+          location: debian-signed
 
   publish:
     executor: cloudsmith/default
+    resource_class: small
     steps:
       - attach_workspace:
           at: ~/
+      - fetch-artifacts:
+          path: ~/artifacts/packages/rpm-signed
+          location: rpm-signed
+      - fetch-artifacts:
+          path: ~/artifacts/packages/debian-signed
+          location: debian-signed
       - cloudsmith/ensure-api-key
       - cloudsmith/install-cli
       - cloudsmith/publish:
@@ -496,8 +570,8 @@ jobs:
   build-docs:
     docker:
       - image: cimg/openjdk:8.0-node
+    resource_class: small
     steps:
-      - checkout
       - fetch-maven
       - attach_workspace:
           at: ~/
@@ -513,7 +587,6 @@ jobs:
       - run:
           name: Build Documentation
           command: |
-            make clean
             ./configure
             make docs
             mkdir -p ~/artifacts
@@ -525,13 +598,9 @@ jobs:
       - cache-save:
           key: maven
           path: $HOME/.m2
-      - store_artifacts:
-          path: ~/artifacts/
-          destination: /
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - artifacts
+      - save-artifacts:
+          path: ~/artifacts
+          location: docs
 
 workflows:
   version: 2.1
