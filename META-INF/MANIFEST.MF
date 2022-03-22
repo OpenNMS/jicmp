@@ -1,5 +1,4 @@
 Manifest-Version: 1.0
-Built-By: circleci
-Created-By: Apache Maven 3.8.4
-Build-Jdk: 1.8.0_322
+Build-Jdk-Spec: 1.8
+Created-By: Maven Javadoc Plugin 3.3.2
 
