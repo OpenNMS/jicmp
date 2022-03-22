@@ -8,7 +8,7 @@ To be able to build JICMP, you need:
 * https://www.gnu.org/software/autoconf/[autoconf]
 * https://www.gnu.org/software/automake/[automake]
 * https://www.gnu.org/software/libtool/[libtool]
-* https://adoptopenjdk.net/[Java JDK] version 1.5 or higher
+* https://adoptopenjdk.net/[Java JDK] version 1.8 or higher
 
 == Clone the Repository
 

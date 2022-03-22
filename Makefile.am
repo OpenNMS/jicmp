@@ -44,9 +44,9 @@ clean-local:
 
 java-classes: java.built
 
-java.built: $(JAVA_FILES)
+java.built: $(JAVA_FILES) pom.xml
 	-mkdir -p $(classdir)
-	$(JAVAC) $(JAVACFLAGS) -source 1.5 -target 1.5 -d $(classdir) $(JAVA_FILES) && touch java.built
+	$(JAVAC) $(JAVACFLAGS) -source $(JAVA_TARGET_VERSION) -target $(JAVA_TARGET_VERSION) -d $(classdir) $(JAVA_FILES) && touch java.built
 
 IcmpSocket.c: org_opennms_protocols_icmp_IcmpSocket.h
 

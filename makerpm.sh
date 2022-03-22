@@ -61,7 +61,7 @@ function branch()
 
 function commit()
 {
-    run git log -1 | grep -E '^commit' | cut -d' ' -f2
+    run git rev-parse --verify HEAD
 }
 
 function extraInfo()
@@ -75,7 +75,7 @@ function extraInfo()
 
 function extraInfo2()
 {
-    echo "  http://opennms.git.sourceforge.net/git/gitweb.cgi?p=opennms/jicmp;a=shortlog;h=$(commit)"
+    echo "  https://github.com/OpenNMS/jicmp/commits/$(commit)"
 }
 
 function version()
@@ -87,7 +87,7 @@ function setJavaHome()
 {
     if [ -z "$JAVA_HOME" ]; then
         # hehe
-        for dir in /usr/java/jdk1.{6,7,8,9}*; do
+        for dir in /usr/java/jdk*; do
             if [ -x "$dir/bin/java" ]; then
                 export JAVA_HOME="$dir"
                 break

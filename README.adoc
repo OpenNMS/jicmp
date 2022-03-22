@@ -10,7 +10,7 @@ _JICMP_ is a small library to allow the use of _IPv4_ _ICMP_ (raw) packets in Ja
 * automake
 * autoconf
 * libtool
-* Java JDK 1.5+
+* Java JDK 1.8+
 
 The repository has a _git_ submodule which contains _Macros_ required to compile from source code.
 
