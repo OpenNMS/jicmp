@@ -1,3 +1,16 @@
+3.0.0
+-----
+* (BREAKING) Require JDK 1.8 or higher.
+* Integrate CI builds with git.
+* Add Antora documentation.
+* Publish Javadoc to Github Pages. (https://opennms.github.io/jicmp/)
+* Modernize maven dependencies.
+* Modernize autoconf/automake/libtool macros.
+
+2.0.5
+-----
+* Fix JDK-searching and use maven bundle plugin 3.x.
+
 2.0.4
 -----
 * Build with 'noexecstack' if available.
