@@ -268,7 +268,6 @@ commands:
               exit 1
             fi
             cd -
-            (file << parameters.path >>/* | sort -u) || :
 
   do-build:
     description: Compile JICMP
@@ -529,37 +528,37 @@ jobs:
           cloudsmith-repository: opennms/common-testing
           package-format: rpm
           package-distribution: el/7
-          package-path: ~/artifacts/packages/rpm-signed/jicmp-2*.i686.rpm
+          package-path: ~/artifacts/packages/rpm-signed/jicmp-[0-9]*.i686.rpm
       - cloudsmith/publish:
           allow-republish: true
           cloudsmith-repository: opennms/common-testing
           package-format: rpm
           package-distribution: el/7
-          package-path: ~/artifacts/packages/rpm-signed/jicmp-debuginfo-2*.i686.rpm
+          package-path: ~/artifacts/packages/rpm-signed/jicmp-debuginfo-[0-9]*.i686.rpm
       - cloudsmith/publish:
           allow-republish: true
           cloudsmith-repository: opennms/common-testing
           package-format: rpm
           package-distribution: el/7
-          package-path: ~/artifacts/packages/rpm-signed/jicmp-2*.x86_64.rpm
+          package-path: ~/artifacts/packages/rpm-signed/jicmp-[0-9]*.x86_64.rpm
       - cloudsmith/publish:
           allow-republish: true
           cloudsmith-repository: opennms/common-testing
           package-format: rpm
           package-distribution: el/7
-          package-path: ~/artifacts/packages/rpm-signed/jicmp-debuginfo-2*.x86_64.rpm
+          package-path: ~/artifacts/packages/rpm-signed/jicmp-debuginfo-[0-9]*.x86_64.rpm
       - cloudsmith/publish:
           allow-republish: true
           cloudsmith-repository: opennms/common-testing
           package-format: rpm
           package-distribution: el/8
-          package-path: ~/artifacts/packages/rpm-signed/jicmp-2*.x86_64.rpm
+          package-path: ~/artifacts/packages/rpm-signed/jicmp-[0-9]*.x86_64.rpm
       - cloudsmith/publish:
           allow-republish: true
           cloudsmith-repository: opennms/common-testing
           package-format: rpm
           package-distribution: el/8
-          package-path: ~/artifacts/packages/rpm-signed/jicmp-debuginfo-2*.x86_64.rpm
+          package-path: ~/artifacts/packages/rpm-signed/jicmp-debuginfo-[0-9]*.x86_64.rpm
       - cloudsmith/publish:
           allow-republish: true
           cloudsmith-repository: opennms/common-testing
