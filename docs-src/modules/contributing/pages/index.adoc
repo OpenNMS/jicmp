@@ -1,0 +1,4 @@
+# Contributing
+
+* Fork JICMP on https://github.com/OpenNMS/jicmp[GitHub]
+* Open an https://issues.opennms.org/projects/JICMP/summary[issue in JIRA]

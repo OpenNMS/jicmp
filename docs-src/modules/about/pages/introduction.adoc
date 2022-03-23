@@ -1,0 +1,6 @@
+:imagesdir: ../assets/images
+:!figure-caption:
+
+= What is JICMP?
+
+JICMP is a small library to facilitate the use of IPv4 ICMP (raw) packets in Java.

@@ -1,0 +1,13 @@
+.About
+* xref:about:introduction.adoc[What is JICMP?]
+* xref:about:legal_notice.adoc[Legal Notice]
+* xref:contributing:index.adoc[Contributing]
+
+.Installation
+* xref:installation:source.adoc[Building JICMP from Source]
+* xref:installation:rpm.adoc[Installing JICMP RPMs]
+* xref:installation:deb.adoc[Installing JICMP Debian Packages]
+
+.Using
+* xref:using:api.adoc[Java API]
+* xref:using:non-root.adoc[Using JICMP as non-root]

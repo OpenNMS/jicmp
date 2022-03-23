@@ -13,6 +13,7 @@
 .classpath
 .project
 .settings
+.vscode
 target
 Makefile
 Makefile.in
@@ -42,6 +43,15 @@ test-driver
 tests.sh
 tests/*.class
 jicmp.jar
+
+.project
+.classpath
+node_modules
+package.json
+package-lock.json
+/build/
+/public/
+/docs-src/antora.yml
 
 /win32/amd64
 /win32/Debug

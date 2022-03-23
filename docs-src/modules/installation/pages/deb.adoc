@@ -1,0 +1,19 @@
+= Installing JICMP Debian Packages
+
+== Add the OpenNMS Repository
+
+[source, shell]
+----
+curl -1sLf \
+  'https://packages.opennms.com/public/common/cfg/setup/bash.deb.sh' \
+  | sudo -E bash
+----
+
+== Install the Package
+
+[source, shell]
+----
+sudo apt-get update
+sudo apt-get install jicmp
+----
+

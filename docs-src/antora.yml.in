@@ -1,0 +1,5 @@
+name: jicmp
+version: '@SHORT_VERSION@'
+title: JICMP
+nav:
+  - modules/ROOT/nav.adoc

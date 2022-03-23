@@ -2,14 +2,14 @@
 # Process this file with autoconf to produce a configure script.
 
 m4_include([version.m4])
-AC_PREREQ(2.59)
-AC_INIT([jicmp], VERSION_NUMBER, [http://www.opennms.org])
+AC_PREREQ([2.69])
+AC_INIT([jicmp],[VERSION_NUMBER],[http://www.opennms.org])
 
 AC_ARG_WITH([rpm-release],[  --with-rpm-release=RELEASE  The RPM release number (default: 1)], RELEASE="$withval", RELEASE="1")
 AC_SUBST([RELEASE])
 
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.9 foreign])
 AC_ENABLE_STATIC([no])
 LT_PREREQ([2.0])
@@ -20,12 +20,12 @@ m4_ifdef([AC_LIBTOOL_TAGS], [AC_LIBTOOL_TAGS([])])
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_LN_S
-AC_PROG_LIBTOOL
+LT_INIT
 AC_PROG_INSTALL
 AC_C_BIGENDIAN
 AX_LIB_SOCKET_NSL
 CL_AS_NOEXECSTACK
-ONMS_CHECK_JDK([1.5])
+ONMS_CHECK_JDK([1.8])
 ONMS_CHECK_SUNCC
 ONMS_SET_CC_ARCH_CFLAGS
 ONMS_SET_CC_WARNING_CFLAGS
@@ -40,7 +40,8 @@ PRINT_VAR(JAVAH)
 PRINT_VAR(JAR)
 PRINT_VAR(JNI_INCLUDES)
 
-AC_HEADER_STDC
+AC_INCLUDES_DEFAULT
+AC_PROG_EGREP
 
 # check for jni.h
 CPPFLAGS="$CPPFLAGS $JNI_INCLUDES -I."
@@ -114,6 +115,9 @@ esac
 
 AM_CONDITIONAL([WIN32], [test x$on_win32 = xyes])
 
-AC_CONFIG_FILES([Makefile jicmp.spec pom.xml solaris/pkginfo])
+SHORT_VERSION="$(echo "$VERSION" | cut -d. -f1-2)"
+AC_SUBST([SHORT_VERSION])
+
+AC_CONFIG_FILES([Makefile jicmp.spec pom.xml solaris/pkginfo docs-src/antora.yml])
 AC_CONFIG_FILES([tests.sh], [chmod +x tests.sh])
 AC_OUTPUT
