@@ -5,7 +5,16 @@
   <artifactId>jicmp-api</artifactId>
   <version>@VERSION@</version>
   <packaging>bundle</packaging>
+
   <name>OpenNMS ICMP API</name>
+  <description>Java JNI API for ICMP</description>
+  <url>https://github.com/opennms/jicmp</url>
+  <inceptionYear>2002</inceptionYear>
+
+  <organization>
+    <name>The OpenNMS Group, Inc.</name>
+    <url>https://www.opennms.com/</url>
+  </organization>
   <licenses>
     <license>
       <name>GNU Lesser General Public License, Version 3</name>
@@ -13,10 +22,60 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <developers>
+    <developer>
+      <id>rangerrick</id>
+      <name>Benjamin Reed</name>
+      <email>ranger@opennms.com</email>
+    </developer>
+    <developer>
+      <id>ronny</id>
+      <name>Ronny Trommer</name>
+      <email>r.trommer@open-factory.org</email>
+    </developer>
+    <developer>
+      <id>ajb</id>
+      <name>Alex Bennee</name>
+      <email>ajb@cbnl.com</email>
+    </developer>
+    <developer>
+      <id>djgregor</id>
+      <name>DJ Gregor</name>
+      <email>dj@gregor.com</email>
+    </developer>
+    <developer>
+      <id>brozow</id>
+      <name>Matt Brozowski</name>
+      <email>matt@brozowski.com</email>
+    </developer>
+  </developers>
+  <contributors>
+    <contributor>
+      <name>Dustin Frisch</name>
+      <email>fooker@lab.sh</email>
+    </contributor>
+    <contributor>
+      <name>Jeff Gehlbach</name>
+      <email>jeffg@opennms.com</email>
+    </contributor>
+    <contributor>
+      <name>Antonio Russo</name>
+      <email>rssntn67@yahoo.it</email>
+    </contributor>
+    <contributor>
+      <name>Luiz Angelo Daros de Luca</name>
+      <email>luizluca@gmail.com</email>
+    </contributor>
+  </contributors>
   <issueManagement>
     <system>JIRA</system>
     <url>https://issues.opennms.org/projects/JICMP/issues</url>
   </issueManagement>
+  <scm>
+    <url>https://github.com/opennms/jicmp</url>
+    <connection>scm:git:https://github.com/opennms/jicmp.git</connection>
+    <developerConnection>scm:git:git@github.com:opennms/jicmp.git</developerConnection>
+  </scm>
   <build>
     <plugins>
       <plugin>

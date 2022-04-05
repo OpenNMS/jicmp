@@ -37,6 +37,7 @@ ltmain.sh
 org_opennms_*.h
 missing
 pom.xml
+pom.xml.asc
 solaris/pkginfo
 stamp-h1
 test-driver
