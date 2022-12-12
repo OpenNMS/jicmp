@@ -16,6 +16,8 @@
 %define arch_arg --with-jvm-arch=64
 %endif
 
+%define debug_package %{nil}
+
 Name: %{pkgname}
 Version: %{version}
 Release: %{rel}%{?dist}
