@@ -9,6 +9,8 @@
 *.loT
 *.log
 *.la
+*.pp
+*.te
 *.trs
 .classpath
 .project
@@ -52,6 +54,7 @@ package.json
 package-lock.json
 /build/
 /public/
+/tmp/
 /docs-src/antora.yml
 
 /win32/amd64

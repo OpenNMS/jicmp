@@ -134,13 +134,13 @@ commands:
           path: /var/cache/yum
       - run:
           name: download RPM packages
-          command: yum -y --downloadonly install automake autoconf curl gcc git gnupg2 java-1.8.0-openjdk-devel libtool make rpm-build which
+          command: yum -y --downloadonly install automake autoconf curl gcc git gnupg2 java-1.8.0-openjdk-devel libtool make rpm-build selinux-policy selinux-policy-devel which
       - cache-save:
           key: rpm-<< parameters.type >>
           path: /var/cache/yum
       - run:
           name: install RPM packages
-          command: yum -y install automake autoconf curl gcc git gnupg2 java-1.8.0-openjdk-devel libtool make rpm-build which
+          command: yum -y install automake autoconf curl gcc git gnupg2 java-1.8.0-openjdk-devel libtool make rpm-build selinux-policy selinux-policy-devel which
 
   fetch-debian-dependencies:
     description: Fetch Debian Dependencies

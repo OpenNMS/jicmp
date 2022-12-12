@@ -18,6 +18,14 @@
 
 %define debug_package %{nil}
 
+%global selinuxtype targeted
+%global modulenames JICMP
+
+# Usage: _format var format
+# Expand 'modulenames' into various formats as needed
+# Format must contain '$x' somewhere to do anything useful
+%global _format() export %1=""; for x in %{modulenames}; do %1+=%2; %1+=" "; done;
+
 Name: %{pkgname}
 Version: %{version}
 Release: %{rel}%{?dist}
@@ -27,7 +35,8 @@ Summary: Java interface to ICMP (ping)
 Source: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 
-BuildRequires: gcc
+BuildRequires: gcc, selinux-policy, selinux-policy-devel
+#Suggests(post): selinux-policy-base, selinux-policy-targeted, policycoreutils
 
 %description
 Java interface to ICMP (ping).
@@ -39,6 +48,9 @@ Java interface to ICMP (ping).
 %configure %{arch_arg}
 make
 
+make -f /usr/share/selinux/devel/Makefile JICMP.pp
+bzip2 -9 JICMP.pp
+
 if test `hostname | grep -c internal.opennms.com` -eq 1; then
 	echo "WARNING: you will need to run 'sysctl -w net.ipv4.ping_group_range=\"0 429496729\"' for this to pass."
 	make check
@@ -46,6 +58,21 @@ fi
 
 %install
 %makeinstall
+
+install -d %{buildroot}%{_datadir}/selinux/packages
+install -m 0644 *.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/
+
+%post
+if [ -x "%{_sbindir}/semodule" ]; then
+	%_format MODULES %{_datadir}/selinux/packages/$x.pp.bz2
+	%{_sbindir}/semodule -n -s %{selinuxtype} -r JICMP 2> /dev/null
+	%selinux_modules_install -s %{selinuxtype} $MODULES
+fi
+
+%postun
+if [ $1 -eq 0 ] && [ -x "%{_sbindir}/semodule" ]; then
+	%selinux_modules_uninstall -s %{selinuxtype} %{modulenames}
+fi
 
 %clean
 if [ "$RPM_BUILD_ROOT" != "/" ]; then
@@ -55,6 +82,7 @@ fi
 %files
 %attr(755,root,root) %{_libdir}/libjicmp*
 %attr(644,root,root) %{_datadir}/java/*.jar
+%attr(644,root,root) %{_datadir}/selinux/packages/*.pp.bz2
 
 %changelog
 * Wed Jul 25 2007 Benjamin Reed <ranger@opennms.org>
