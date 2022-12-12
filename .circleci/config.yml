@@ -11,10 +11,10 @@ parameters:
   maven-version:
     type: string
     default: 3.6.3
-  # 11.5.0 is the last version with JDK8 installed
+  # use the oldest version
   xcode-version:
     type: string
-    default: 11.5.0
+    default: 11.7.0
 
 executors:
   centos-sign-executor:
@@ -327,6 +327,11 @@ jobs:
       - fetch-maven
       - attach_workspace:
           at: ~/
+      - run:
+          name: install OpenJDK 8
+          command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install "openjdk@8"
+            sudo ln -sfn /usr/local/opt/openjdk@8/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-8.jdk
       - do-build
       - run:
           name: collect mac binaries
