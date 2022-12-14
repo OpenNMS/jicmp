@@ -3,19 +3,6 @@
 %define version @VERSION@
 %define pkgname @PACKAGE@
 
-%define _libdir %_prefix/lib
-%define arch_arg --with-jvm-arch=32
-
-%ifarch x86_64
-%define _libdir %_prefix/lib64
-%define arch_arg --with-jvm-arch=64
-%endif
-
-%ifarch s390x
-%define _libdir %_prefix/lib64
-%define arch_arg --with-jvm-arch=64
-%endif
-
 %define debug_package %{nil}
 
 %global selinuxtype targeted
@@ -45,7 +32,7 @@ Java interface to ICMP (ping).
 %setup -n %{name}-%{version}
 
 %build
-%configure %{arch_arg}
+%configure
 make
 
 make -f /usr/share/selinux/devel/Makefile JICMP.pp

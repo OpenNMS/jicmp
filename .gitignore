@@ -9,8 +9,6 @@
 *.loT
 *.log
 *.la
-*.pp
-*.te
 *.trs
 .classpath
 .project
@@ -46,6 +44,13 @@ test-driver
 tests.sh
 tests/*.class
 jicmp.jar
+
+# selinux files
+*.fc
+*.if
+*.pp
+*.pp.bz2
+*.te
 
 .project
 .classpath
