@@ -1,3 +1,7 @@
+3.0.2
+-----
+* Automatically publish to Maven Central.
+
 3.0.1
 -----
 * Rework build system for automated publishing to cloudsmith.
