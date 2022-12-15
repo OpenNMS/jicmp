@@ -1,3 +1,9 @@
+jicmp (3.0.1-1) stable; urgency=medium
+ 
+  * Build system rework.
+ 
+ -- Benjamin Reed <ranger@opennms.org>  Thu, 15 Dec 2022 13:05:00 -0400
+ 
 jicmp (3.0.0-1) stable; urgency=low
 
   * JICMP now requires JDK 8.

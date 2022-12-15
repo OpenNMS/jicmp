@@ -1,3 +1,8 @@
+3.0.1
+-----
+* Rework build system for automated publishing to cloudsmith.
+* Support configuring selinux in RPMs.
+
 3.0.0
 -----
 * (BREAKING) Require JDK 1.8 or higher.
