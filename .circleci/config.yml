@@ -610,7 +610,7 @@ workflows:
           filters:
             tags:
               only:
-                - /^v.*/
+                - /^jicmp.*/
             branches:
               ignore: gh-pages
       - build-docs:
@@ -619,7 +619,7 @@ workflows:
           filters:
             tags:
               only:
-                - /^v.*/
+                - /^jicmp.*/
       - build-packages:
           matrix:
             alias: build-packages-arm
@@ -631,7 +631,7 @@ workflows:
           filters:
             tags:
               only:
-                - /^v.*/
+                - /^jicmp.*/
       - build-packages:
           matrix:
             alias: build-packages-intel
@@ -643,14 +643,14 @@ workflows:
           filters:
             tags:
               only:
-                - /^v.*/
+                - /^jicmp.*/
       - build-mac:
           requires:
             - build-from-source
           filters:
             tags:
               only:
-                - /^v.*/
+                - /^jicmp.*/
       - sign-debs:
           requires:
             - build-packages-arm
@@ -658,7 +658,7 @@ workflows:
           filters:
             tags:
               only:
-                - /^v.*/
+                - /^jicmp.*/
       - sign-rpms:
           requires:
             - build-packages-arm
@@ -666,7 +666,7 @@ workflows:
           filters:
             tags:
               only:
-                - /^v.*/
+                - /^jicmp.*/
       - publish:
           requires:
             - sign-debs
@@ -674,7 +674,7 @@ workflows:
           filters:
             branches:
               only:
-                - master
+                - /^jicmp.*/
       - publish:
           target_repository: opennms/common
           requires:
@@ -683,11 +683,11 @@ workflows:
           filters:
             branches:
               only:
-                - /^v.*/
+                - /^jicmp.*/
       - publish-docs:
           filters:
             branches:
               only:
-                - /^v.*/
+                - /^jicmp.*/
           requires:
             - build-docs
