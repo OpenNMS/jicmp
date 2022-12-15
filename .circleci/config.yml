@@ -496,7 +496,7 @@ jobs:
           cloudsmith-repository: << parameters.target_repository >>
           package-format: rpm
           package-distribution: el/7
-          package-path: ~/artifacts/rpm-signed/jicmp-*.armv7hl
+          package-path: ~/artifacts/rpm-signed/jicmp-*.armv7hl.rpm
       - cloudsmith/publish:
           allow-republish: true
           cloudsmith-repository: << parameters.target_repository >>
@@ -520,7 +520,7 @@ jobs:
           cloudsmith-repository: << parameters.target_repository >>
           package-format: rpm
           package-distribution: el/8
-          package-path: ~/artifacts/rpm-signed/jicmp-*.armv7hl
+          package-path: ~/artifacts/rpm-signed/jicmp-*.armv7hl.rpm
       - cloudsmith/publish:
           allow-republish: true
           cloudsmith-repository: << parameters.target_repository >>
@@ -544,7 +544,7 @@ jobs:
           cloudsmith-repository: << parameters.target_repository >>
           package-format: rpm
           package-distribution: el/9
-          package-path: ~/artifacts/rpm-signed/jicmp-*.armv7hl
+          package-path: ~/artifacts/rpm-signed/jicmp-*.armv7hl.rpm
       - cloudsmith/publish:
           allow-republish: true
           cloudsmith-repository: << parameters.target_repository >>
