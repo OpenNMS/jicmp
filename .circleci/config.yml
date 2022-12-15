@@ -681,7 +681,7 @@ workflows:
             - sign-debs
             - sign-rpms
           filters:
-            branches:
+            tags:
               only:
                 - /^jicmp.*/
       - publish-docs:
