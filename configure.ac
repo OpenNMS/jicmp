@@ -118,6 +118,6 @@ AM_CONDITIONAL([WIN32], [test x$on_win32 = xyes])
 SHORT_VERSION="$(echo "$VERSION" | cut -d. -f1-2)"
 AC_SUBST([SHORT_VERSION])
 
-AC_CONFIG_FILES([Makefile jicmp.spec pom.xml solaris/pkginfo docs-src/antora.yml])
+AC_CONFIG_FILES([Makefile jicmp.spec JICMP.te pom.xml solaris/pkginfo docs-src/antora.yml])
 AC_CONFIG_FILES([tests.sh], [chmod +x tests.sh])
 AC_OUTPUT

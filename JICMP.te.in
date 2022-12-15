@@ -1,0 +1,8 @@
+policy_module(JICMP,@VERSION@)
+
+gen_require(`
+  type port_t;
+  type unconfined_service_t;
+')
+
+allow unconfined_service_t port_t:icmp_socket name_bind;
