@@ -495,73 +495,25 @@ jobs:
           allow-republish: true
           cloudsmith-repository: << parameters.target_repository >>
           package-format: rpm
-          package-distribution: el/7
+          package-distribution: any-distro/any-version
           package-path: ~/artifacts/rpm-signed/jicmp-*.armv7hl.rpm
       - cloudsmith/publish:
           allow-republish: true
           cloudsmith-repository: << parameters.target_repository >>
           package-format: rpm
-          package-distribution: el/7
+          package-distribution: any-distro/any-version
           package-path: ~/artifacts/rpm-signed/jicmp-*.aarch64.rpm
       - cloudsmith/publish:
           allow-republish: true
           cloudsmith-repository: << parameters.target_repository >>
           package-format: rpm
-          package-distribution: el/7
+          package-distribution: any-distro/any-version
           package-path: ~/artifacts/rpm-signed/jicmp-*.i686.rpm
       - cloudsmith/publish:
           allow-republish: true
           cloudsmith-repository: << parameters.target_repository >>
           package-format: rpm
-          package-distribution: el/7
-          package-path: ~/artifacts/rpm-signed/jicmp-*.x86_64.rpm
-      - cloudsmith/publish:
-          allow-republish: true
-          cloudsmith-repository: << parameters.target_repository >>
-          package-format: rpm
-          package-distribution: el/8
-          package-path: ~/artifacts/rpm-signed/jicmp-*.armv7hl.rpm
-      - cloudsmith/publish:
-          allow-republish: true
-          cloudsmith-repository: << parameters.target_repository >>
-          package-format: rpm
-          package-distribution: el/8
-          package-path: ~/artifacts/rpm-signed/jicmp-*.aarch64.rpm
-      - cloudsmith/publish:
-          allow-republish: true
-          cloudsmith-repository: << parameters.target_repository >>
-          package-format: rpm
-          package-distribution: el/8
-          package-path: ~/artifacts/rpm-signed/jicmp-*.i686.rpm
-      - cloudsmith/publish:
-          allow-republish: true
-          cloudsmith-repository: << parameters.target_repository >>
-          package-format: rpm
-          package-distribution: el/8
-          package-path: ~/artifacts/rpm-signed/jicmp-*.x86_64.rpm
-      - cloudsmith/publish:
-          allow-republish: true
-          cloudsmith-repository: << parameters.target_repository >>
-          package-format: rpm
-          package-distribution: el/9
-          package-path: ~/artifacts/rpm-signed/jicmp-*.armv7hl.rpm
-      - cloudsmith/publish:
-          allow-republish: true
-          cloudsmith-repository: << parameters.target_repository >>
-          package-format: rpm
-          package-distribution: el/9
-          package-path: ~/artifacts/rpm-signed/jicmp-*.aarch64.rpm
-      - cloudsmith/publish:
-          allow-republish: true
-          cloudsmith-repository: << parameters.target_repository >>
-          package-format: rpm
-          package-distribution: el/9
-          package-path: ~/artifacts/rpm-signed/jicmp-*.i686.rpm
-      - cloudsmith/publish:
-          allow-republish: true
-          cloudsmith-repository: << parameters.target_repository >>
-          package-format: rpm
-          package-distribution: el/9
+          package-distribution: any-distro/any-version
           package-path: ~/artifacts/rpm-signed/jicmp-*.x86_64.rpm
       - cloudsmith/publish:
           allow-republish: true
