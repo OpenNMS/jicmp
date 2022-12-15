@@ -671,6 +671,7 @@ workflows:
           requires:
             - sign-debs
             - sign-rpms
+          filters:
             branches:
               only:
                 - master
