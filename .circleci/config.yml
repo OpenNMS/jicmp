@@ -17,15 +17,12 @@ parameters:
     default: 11.7.0
 
 executors:
-  base-executor:
+  java-executor:
     docker:
-      - image: cimg/base:stable-20.04
+      - image: cimg/openjdk:8.0
   package-executor:
     machine:
       image: ubuntu-2004:current
-  centos-executor:
-    docker:
-      - image: opennms/build-env:1.8.0.302.b08-3.6.3-b8090
   debian-executor:
     docker:
       - image: opennms/build-env:debian-jdk8-b8766
@@ -285,7 +282,7 @@ commands:
 
 jobs:
   build-from-source:
-    executor: base-executor
+    executor: java-executor
     resource_class: small
     steps:
       - checkout
@@ -298,7 +295,6 @@ jobs:
               automake \
               gcc \
               libtool \
-              openjdk-8-jdk-headless \
               rpm
       - fetch-maven
       - cache-restore:
@@ -473,6 +469,22 @@ jobs:
           path: ~/artifacts/debian-signed/
           location: debian-signed
 
+  deploy:
+    executor: java-executor
+    resource_class: small
+    steps:
+      - fetch-maven
+      - attach_workspace:
+          at: ~/
+      - cache-restore:
+          key: maven
+          path: $HOME/.m2
+      - sign-packages/setup-env:
+          skip_if_forked_pr: true
+      - run:
+          name: build and deploy
+          command: ~/maven/bin/mvn -Prelease -s .circleci/.circleci.settings.xml -DskipTests -Dmaven.verify.skip=true -Dmaven.install.skip=true deploy
+
   publish:
     executor: cloudsmith/default
     resource_class: small
@@ -609,8 +621,7 @@ workflows:
       - build-from-source:
           filters:
             tags:
-              only:
-                - /^jicmp.*/
+              only: /^jicmp.*/
             branches:
               ignore: gh-pages
       - build-docs:
@@ -618,8 +629,7 @@ workflows:
             - build-from-source
           filters:
             tags:
-              only:
-                - /^jicmp.*/
+              only: /^jicmp.*/
       - build-packages:
           matrix:
             alias: build-packages-arm
@@ -630,8 +640,7 @@ workflows:
             - build-from-source
           filters:
             tags:
-              only:
-                - /^jicmp.*/
+              only: /^jicmp.*/
       - build-packages:
           matrix:
             alias: build-packages-intel
@@ -642,58 +651,76 @@ workflows:
             - build-from-source
           filters:
             tags:
-              only:
-                - /^jicmp.*/
+              only: /^jicmp.*/
       - build-mac:
           requires:
             - build-from-source
           filters:
             tags:
-              only:
-                - /^jicmp.*/
+              only: /^jicmp.*/
       - sign-debs:
           requires:
             - build-packages-arm
             - build-packages-intel
           filters:
             tags:
-              only:
-                - /^jicmp.*/
+              only: /^jicmp.*/
       - sign-rpms:
           requires:
             - build-packages-arm
             - build-packages-intel
           filters:
             tags:
-              only:
-                - /^jicmp.*/
-      - publish:
+              only: /^jicmp.*/
+      - deploy:
+          context:
+            - OSSRH Principal
+            - OpenNMS Build
+          # depend on signing/build steps to validate we're ready to deploy
           requires:
+            - build-docs
+            - build-mac
+            - sign-debs
+            - sign-rpms
+          filters:
+            tags:
+              only: /^jicmp.*/
+            branches:
+              only: master
+      - publish:
+          # depend on signing/build steps to validate we're ready to publish
+          requires:
+            - build-docs
+            - build-mac
             - sign-debs
             - sign-rpms
           filters:
             tags:
               ignore: /.*/
             branches:
-              only:
-                - master
+              only: master
       - publish:
           target_repository: opennms/common
+          # depend on signing/build steps to validate we're ready to publish
           requires:
+            - build-docs
+            - build-mac
             - sign-debs
             - sign-rpms
           filters:
             tags:
-              only:
-                - /^jicmp.*/
+              only: /^jicmp.*/
             branches:
               ignore: /.*/
       - publish-docs:
+          # depend on signing/build steps to validate we're ready to publish
           filters:
             tags:
-              only:
-                - /^jicmp.*/
+              only: /^jicmp.*/
             branches:
               ignore: /.*/
           requires:
             - build-docs
+            - build-mac
+            - sign-debs
+            - sign-rpms
