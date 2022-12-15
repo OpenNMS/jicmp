@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   cloudsmith: cloudsmith/cloudsmith@1.0.5
-  sign-packages: opennms/sign-packages@2.3.0
+  sign-packages: opennms/sign-packages@3.0.0
 
 parameters:
   debian-version:
@@ -398,8 +398,8 @@ jobs:
           location: << parameters.platform >>-rpm
 
   sign-rpms:
-    executor: centos-executor
-    resource_class: small
+    executor: package-executor
+    resource_class: medium
     steps:
       - attach_workspace:
           at: ~/
@@ -415,18 +415,26 @@ jobs:
       - fetch-artifacts:
           path: ~/artifacts/rpm/
           location: amd64-rpm
-      - sign-packages/install-rpm-dependencies
+      - run:
+          name: install dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get -y install gnupg2 rpm
       - sign-packages/setup-env:
           gnupg_home: ~/tmp/gpg
-      - sign-packages/sign-rpms:
-          gnupg_home: ~/tmp/gpg
-          gnupg_key: opennms@opennms.org
-          packages: ~/artifacts/rpm/*.rpm
       - run:
           name: prepare artifacts
           command: |
-            mkdir -p ~/artifacts/rpm-signed/
-            cp -f ~/artifacts/rpm/*.rpm ~/artifacts/rpm-signed/
+            cd ~
+            mkdir -p artifacts/rpm-signed/
+            find artifacts/rpm -name \*.rpm | while read -r INFILE; do
+              OUTFILE="$(echo "$INFILE" | sed -e 's,artifacts/rpm,artifacts/rpm-signed,g')"
+              docker run -v `pwd`:/workspace -w /workspace opennms/rpm-add-checksum -- "${INFILE}" "${OUTFILE}"
+            done
+      - sign-packages/sign-rpms:
+          gnupg_home: ~/tmp/gpg
+          gnupg_key: opennms@opennms.org
+          packages: ~/artifacts/rpm-signed/*.rpm
       - save-artifacts:
           path: ~/artifacts/rpm-signed
           location: rpm-signed

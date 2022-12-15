@@ -106,6 +106,7 @@ generatePackage rpm \
 	--after-install src/rpm/post.sh \
 	--after-upgrade src/rpm/post.sh \
 	--after-remove  src/rpm/postun.sh \
+	--rpm-digest    sha256 \
 	"${EXTRA_ARGS[@]}"
 
 mkdir -p target
