@@ -67,15 +67,25 @@
       <email>luizluca@gmail.com</email>
     </contributor>
   </contributors>
+  <scm>
+    <connection>scm:git:https://github.com/opennms/jicmp.git</connection>
+    <developerConnection>scm:git:git@github.com:opennms/jicmp.git</developerConnection>
+    <url>https://github.com/opennms/jicmp</url>
+  </scm>
   <issueManagement>
     <system>JIRA</system>
     <url>https://issues.opennms.org/projects/JICMP/issues</url>
   </issueManagement>
-  <scm>
-    <url>https://github.com/opennms/jicmp</url>
-    <connection>scm:git:https://github.com/opennms/jicmp.git</connection>
-    <developerConnection>scm:git:git@github.com:opennms/jicmp.git</developerConnection>
-  </scm>
+  <distributionManagement>
+    <snapshotRepository>
+      <id>opennms-ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>opennms-ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+    </repository>
+  </distributionManagement>
   <build>
     <plugins>
       <plugin>
@@ -106,7 +116,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.2.1</version>
         <executions>
           <execution>
             <goals>
@@ -118,11 +128,22 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.3.2</version>
+        <version>3.4.1</version>
         <configuration>
           <aggregate>true</aggregate>
           <notimestamp>true</notimestamp>
           <use>false</use>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.13</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>opennms-ossrh</serverId>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
     </plugins>
@@ -130,8 +151,31 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh-external</artifactId>
-        <version>3.5.1</version>
+        <version>3.5.2</version>
       </extension>
     </extensions>
   </build>
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.0.1</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
