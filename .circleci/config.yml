@@ -671,10 +671,9 @@ workflows:
           requires:
             - sign-debs
             - sign-rpms
-          filters:
             branches:
               only:
-                - /^jicmp.*/
+                - master
       - publish:
           target_repository: opennms/common
           requires:
@@ -686,7 +685,7 @@ workflows:
                 - /^jicmp.*/
       - publish-docs:
           filters:
-            branches:
+            tags:
               only:
                 - /^jicmp.*/
           requires:
