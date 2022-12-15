@@ -672,6 +672,8 @@ workflows:
             - sign-debs
             - sign-rpms
           filters:
+            tags:
+              ignore: /.*/
             branches:
               only:
                 - master
@@ -684,10 +686,14 @@ workflows:
             tags:
               only:
                 - /^jicmp.*/
+            branches:
+              ignore: /.*/
       - publish-docs:
           filters:
             tags:
               only:
                 - /^jicmp.*/
+            branches:
+              ignore: /.*/
           requires:
             - build-docs
