@@ -7,5 +7,5 @@ gen_require(`
   class icmp_socket { name_bind node_bind };
 ')
 
-allow unconfined_service_t node_t:icmp_socket name_bind;
+allow unconfined_service_t node_t:icmp_socket node_bind;
 allow unconfined_service_t port_t:icmp_socket name_bind;
