@@ -675,7 +675,6 @@ workflows:
       - deploy:
           context:
             - OSSRH Principal
-            - OpenNMS Build
           # depend on signing/build steps to validate we're ready to deploy
           requires:
             - build-docs
@@ -687,7 +686,9 @@ workflows:
               only: /^jicmp.*/
             branches:
               only: master
-      - publish:
+      - publish-snapshot:
+          context:
+            - "cloudsmith-publish-account"
           # depend on signing/build steps to validate we're ready to publish
           requires:
             - build-docs
@@ -699,7 +700,9 @@ workflows:
               ignore: /.*/
             branches:
               only: master
-      - publish:
+      - publish-release:
+          context:
+            - "cloudsmith-publish-account"
           target_repository: opennms/common
           # depend on signing/build steps to validate we're ready to publish
           requires:
