@@ -25,7 +25,7 @@ executors:
       image: ubuntu-2004:current
   debian-executor:
     docker:
-      - image: opennms/build-env:debian-jdk8-b8766
+      - image: opennms/build-env:debian-jdk8-b9656
 
 commands:
   cache-restore:
