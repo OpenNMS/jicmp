@@ -34,7 +34,7 @@ apt-get -y --no-install-recommends install \
 	software-properties-common \
 	wget
 
-apt-add-repository --yes 'deb http://security.debian.org/debian-security stretch/updates main'
+apt-add-repository --yes 'deb http://archive.debian.org/debian-security stretch/updates main'
 apt-get update
 apt-get -y install openjdk-8-jdk-headless
 
