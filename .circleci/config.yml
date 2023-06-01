@@ -7,7 +7,7 @@ orbs:
 parameters:
   debian-version:
     type: string
-    default: stretch
+    default: buster
   maven-version:
     type: string
     default: 3.6.3
