@@ -49,7 +49,7 @@ mkdir("classes");
 run("$jdk_home\\bin\\javac", "-d", "classes", "-sourcepath", "src/main/java", "src/main/java/org/opennms/protocols/icmp/IcmpSocket.java");
 
 print "Generating JNI Headers\n";
-run("$jdk_home\\bin\\javah","-classpath", "classes", "org.opennms.protocols.icmp.IcmpSocket");
+run("$jdk_home\\bin\\javac","-h","-classpath", "classes", "org.opennms.protocols.icmp.IcmpSocket");
 
 print "Building x86 MSM Modules\n";
 run("$vis_studio\\devenv", ".\\win32\\jicmp.sln", "/out", "release-win32.out", "/log", "release-win32.log", "-rebuild", "Release|Win32");
