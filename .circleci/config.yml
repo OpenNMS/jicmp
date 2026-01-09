@@ -10,7 +10,7 @@ parameters:
     default: buster
   maven-version:
     type: string
-    default: 3.6.3
+    default: 3.9.12
   # use the oldest version
   xcode-version:
     type: string
