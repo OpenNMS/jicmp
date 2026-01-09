@@ -19,7 +19,7 @@ parameters:
 executors:
   java-executor:
     docker:
-      - image: cimg/openjdk:8.0
+      - image: cimg/openjdk:21.0
   package-executor:
     machine:
       image: ubuntu-2004:current
@@ -143,7 +143,7 @@ commands:
           path: /var/cache/apt
       - run:
           name: download jdk
-          command: sudo apt -y --download-only -q -t << pipeline.parameters.debian-version >>-backports install openjdk-8-jdk-headless
+          command: sudo apt -y --download-only -q -t << pipeline.parameters.debian-version >>-backports install openjdk-21-jdk-headless
       - run:
           name: download other dependencies
           command: sudo apt -y --download-only -q install autotools-dev autoconf automake cdbs curl debhelper debianutils devscripts dpkg-dev git software-properties-common
@@ -152,7 +152,7 @@ commands:
           path: /var/cache/apt
       - run:
           name: install jdk
-          command: sudo apt -y -q -t << pipeline.parameters.debian-version >>-backports install openjdk-8-jdk-headless
+          command: sudo apt -y -q -t << pipeline.parameters.debian-version >>-backports install openjdk-21-jdk-headless
       - run:
           name: install other dependencies
           command: sudo apt -y -q install autotools-dev autoconf automake cdbs curl debhelper debianutils devscripts dpkg-dev git software-properties-common
@@ -586,7 +586,7 @@ jobs:
 
   publish-docs:
     docker:
-      - image: cimg/openjdk:8.0-node
+      - image: cimg/openjdk:21.0-node
     resource_class: small
     steps:
       - checkout
