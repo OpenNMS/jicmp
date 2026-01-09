@@ -51,7 +51,7 @@ java.built: $(JAVA_FILES) pom.xml
 IcmpSocket.c: org_opennms_protocols_icmp_IcmpSocket.h
 
 org_opennms_protocols_icmp_IcmpSocket.h: java.built
-	$(JAVAH) -classpath $(classdir) org.opennms.protocols.icmp.IcmpSocket
+	$(JAVAC) -h -classpath $(classdir) org.opennms.protocols.icmp.IcmpSocket
 
 jicmp.jar: java.built
 	cd $(classdir) && \
