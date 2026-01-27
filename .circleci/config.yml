@@ -1,31 +1,32 @@
+---
 version: 2.1
 
 orbs:
   cloudsmith: cloudsmith/cloudsmith@1.0.5
-  sign-packages: opennms/sign-packages@3.0.0
+  sign-packages: opennms/sign-packages@3.0.1
 
 parameters:
   debian-version:
     type: string
-    default: buster
+    default: bookworm
   maven-version:
     type: string
-    default: 3.6.3
+    default: 3.8.9
   # use the oldest version
   xcode-version:
     type: string
-    default: 11.7.0
+    default: 26.2.0
 
 executors:
   java-executor:
     docker:
-      - image: cimg/openjdk:8.0
+      - image: cimg/openjdk:17.0
   package-executor:
     machine:
-      image: ubuntu-2004:current
+      image: ubuntu-2404:current
   debian-executor:
     docker:
-      - image: opennms/build-env:debian-jdk8
+      - image: opennms/build-env:circleci-ubuntu-jdk17-b10832
 
 commands:
   cache-restore:
@@ -131,19 +132,13 @@ commands:
             fi
 
             sudo apt -q update
-            sudo apt -y -q install gnupg2 software-properties-common
-
-            echo "deb http://deb.debian.org/debian << pipeline.parameters.debian-version >>-backports main" | sudo tee /etc/apt/sources.list.d/<< pipeline.parameters.debian-version >>-backports.list
-            echo "deb http://deb.debian.org/debian-security << pipeline.parameters.debian-version >>/updates main" | sudo tee /etc/apt/sources.list.d/<< pipeline.parameters.debian-version >>-security.list
-            sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138 0E98404D386FA1D9 AA8E81B4331F7F50 112695A0E562B32A
-            sudo apt -q update
-            sudo apt -y -q -t << pipeline.parameters.debian-version >>-backports install apt-transport-https ca-certificates
+            sudo apt -y -q install gnupg2 software-properties-common apt-transport-https ca-certificates
       - cache-restore:
           key: debian-<< parameters.type >>
           path: /var/cache/apt
       - run:
           name: download jdk
-          command: sudo apt -y --download-only -q -t << pipeline.parameters.debian-version >>-backports install openjdk-8-jdk-headless
+          command: sudo apt -y --download-only -q install openjdk-17-jdk-headless
       - run:
           name: download other dependencies
           command: sudo apt -y --download-only -q install autotools-dev autoconf automake cdbs curl debhelper debianutils devscripts dpkg-dev git software-properties-common
@@ -152,7 +147,10 @@ commands:
           path: /var/cache/apt
       - run:
           name: install jdk
-          command: sudo apt -y -q -t << pipeline.parameters.debian-version >>-backports install openjdk-8-jdk-headless
+          command: |
+            sudo rm -rf /etc/ssl/certs/java/cacerts
+            sudo update-ca-certificates
+            sudo apt -y -q install openjdk-17-jdk-headless
       - run:
           name: install other dependencies
           command: sudo apt -y -q install autotools-dev autoconf automake cdbs curl debhelper debianutils devscripts dpkg-dev git software-properties-common
@@ -257,20 +255,14 @@ commands:
     parameters:
       platform:
         type: enum
-        enum: ["arm32v7", "arm64v8", "i386", "amd64"]
+        enum: ["arm64v8", "amd64"]
     steps:
       - run:
           name: build << parameters.platform >>
           command: |
             case "<< parameters.platform >>" in
-              arm32v7)
-                PLATFORM="linux/arm/v7"
-                ;;
               arm64)
                 PLATFORM="linux/arm64"
-                ;;
-              i386)
-                PLATFORM="linux/i386"
                 ;;
               amd64)
                 PLATFORM="linux/amd64"
@@ -278,7 +270,7 @@ commands:
             esac
             set | grep CIRCLE > /tmp/build-env.txt
             docker run --rm --privileged tonistiigi/binfmt:latest --install all
-            docker run --env-file /tmp/build-env.txt --rm -it --platform "${PLATFORM}" -v "$(pwd):/workdir" -w /workdir "<< parameters.platform >>/debian:buster" ./build-all.sh "<< parameters.platform >>"
+            docker run --env-file /tmp/build-env.txt --rm -it --platform "${PLATFORM}" -v "$(pwd):/workdir" -w /workdir "<< parameters.platform >>/debian:bookworm" ./build-all.sh "<< parameters.platform >>"
 
 jobs:
   build-from-source:
@@ -338,13 +330,14 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          name: install OpenJDK 8
+          name: install OpenJDK 17
           command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install "openjdk@8"
-            sudo ln -sfn /usr/local/opt/openjdk@8/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-8.jdk
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install "openjdk@17"
+            sudo ln -sfn /usr/local/opt/openjdk@17/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-17.jdk
       - run:
           name: configure and build
           command: |
+            export JAVA_HOME="$(/usr/libexec/java_home -v 17)"
             export PATH="$HOME/maven/bin:$PATH"
             ./configure
             make
@@ -401,13 +394,7 @@ jobs:
           at: ~/
       - fetch-artifacts:
           path: ~/artifacts/rpm/
-          location: arm32v7-rpm
-      - fetch-artifacts:
-          path: ~/artifacts/rpm/
           location: arm64v8-rpm
-      - fetch-artifacts:
-          path: ~/artifacts/rpm/
-          location: i386-rpm
       - fetch-artifacts:
           path: ~/artifacts/rpm/
           location: amd64-rpm
@@ -443,17 +430,12 @@ jobs:
           at: ~/
       - fetch-artifacts:
           path: ~/artifacts/deb
-          location: arm32v7-deb
-      - fetch-artifacts:
-          path: ~/artifacts/deb
           location: arm64v8-deb
       - fetch-artifacts:
           path: ~/artifacts/deb
-          location: i386-deb
-      - fetch-artifacts:
-          path: ~/artifacts/deb
           location: amd64-deb
-      - sign-packages/install-deb-dependencies
+      - sign-packages/install-deb-dependencies:
+          use_sudo: true
       - sign-packages/setup-env:
           gnupg_home: ~/tmp/gpg
       - sign-packages/sign-debs:
@@ -508,19 +490,7 @@ jobs:
           cloudsmith-repository: << parameters.target_repository >>
           package-format: rpm
           package-distribution: any-distro/any-version
-          package-path: ~/artifacts/rpm-signed/jicmp-*.armv7hl.rpm
-      - cloudsmith/publish:
-          allow-republish: true
-          cloudsmith-repository: << parameters.target_repository >>
-          package-format: rpm
-          package-distribution: any-distro/any-version
           package-path: ~/artifacts/rpm-signed/jicmp-*.aarch64.rpm
-      - cloudsmith/publish:
-          allow-republish: true
-          cloudsmith-repository: << parameters.target_repository >>
-          package-format: rpm
-          package-distribution: any-distro/any-version
-          package-path: ~/artifacts/rpm-signed/jicmp-*.i686.rpm
       - cloudsmith/publish:
           allow-republish: true
           cloudsmith-repository: << parameters.target_repository >>
@@ -532,19 +502,7 @@ jobs:
           cloudsmith-repository: << parameters.target_repository >>
           package-format: deb
           package-distribution: any-distro/any-version
-          package-path: ~/artifacts/debian-signed/jicmp_*_armhf.deb
-      - cloudsmith/publish:
-          allow-republish: true
-          cloudsmith-repository: << parameters.target_repository >>
-          package-format: deb
-          package-distribution: any-distro/any-version
           package-path: ~/artifacts/debian-signed/jicmp_*_arm64.deb
-      - cloudsmith/publish:
-          allow-republish: true
-          cloudsmith-repository: << parameters.target_repository >>
-          package-format: deb
-          package-distribution: any-distro/any-version
-          package-path: ~/artifacts/debian-signed/jicmp_*_i386.deb
       - cloudsmith/publish:
           allow-republish: true
           cloudsmith-repository: << parameters.target_repository >>
@@ -554,7 +512,7 @@ jobs:
 
   build-docs:
     docker:
-      - image: cimg/openjdk:8.0-node
+      - image: cimg/openjdk:17.0-node
     resource_class: small
     steps:
       - fetch-maven
@@ -586,7 +544,7 @@ jobs:
 
   publish-docs:
     docker:
-      - image: cimg/openjdk:8.0-node
+      - image: cimg/openjdk:17.0-node
     resource_class: small
     steps:
       - checkout
@@ -634,7 +592,7 @@ workflows:
           matrix:
             alias: build-packages-arm
             parameters:
-              platform: ["arm32v7", "arm64v8"]
+              platform: ["arm64v8"]
               resource: ["arm.medium"]
           requires:
             - build-from-source
@@ -645,7 +603,7 @@ workflows:
           matrix:
             alias: build-packages-intel
             parameters:
-              platform: ["i386","amd64"]
+              platform: ["amd64"]
               resource: ["medium"]
           requires:
             - build-from-source
