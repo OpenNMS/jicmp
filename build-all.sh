@@ -36,7 +36,7 @@ apt-get -y --no-install-recommends install \
 
 apt-add-repository --yes 'deb http://archive.debian.org/debian-security stretch/updates main'
 apt-get update
-apt-get -y install openjdk-8-jdk-headless
+apt-get -y install openjdk-17-jdk-headless
 
 # build tarball and binaries from source
 make clean >/dev/null 2>&1 || :
