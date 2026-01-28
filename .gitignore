@@ -67,3 +67,5 @@ package-lock.json
 /win32/ipch
 /win32/Release
 /win32/x86
+
+.idea/
