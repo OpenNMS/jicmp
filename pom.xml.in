@@ -104,7 +104,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.10.1</version>
+        <version>3.14.1</version>
         <configuration>
           <release>@JAVA_TARGET_VERSION@</release>
           <encoding>UTF-8</encoding>
@@ -115,7 +115,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.2.1</version>
+        <version>3.4.0</version>
         <executions>
           <execution>
             <goals>
@@ -127,7 +127,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.4.1</version>
+        <version>3.12.0</version>
         <configuration>
           <aggregate>true</aggregate>
           <notimestamp>true</notimestamp>
@@ -137,7 +137,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.13</version>
+        <version>1.7.0</version>
         <extensions>true</extensions>
         <configuration>
           <serverId>opennms-ossrh</serverId>
@@ -150,7 +150,7 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh-external</artifactId>
-        <version>3.5.2</version>
+        <version>3.5.3</version>
       </extension>
     </extensions>
   </build>
@@ -162,7 +162,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>3.0.1</version>
+            <version>3.2.8</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
