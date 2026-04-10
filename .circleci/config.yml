@@ -408,10 +408,10 @@ jobs:
       - sign-packages/sign-rpms:
           gnupg_home: ~/tmp/gpg
           gnupg_key: opennms@opennms.org
-          packages: ~/artifacts/rpm-signed/*.rpm
+          packages: ~/artifacts/rpm/*.rpm
       - save-artifacts:
-          path: ~/artifacts/rpm-signed
-          location: rpm-signed
+          path: ~/artifacts/rpm
+          location: rpm
 
   sign-debs:
     executor: debian-executor
@@ -469,8 +469,8 @@ jobs:
       - attach_workspace:
           at: ~/
       - fetch-artifacts:
-          path: ~/artifacts/rpm-signed
-          location: rpm-signed
+          path: ~/artifacts/rpm
+          location: rpm
       - fetch-artifacts:
           path: ~/artifacts/debian-signed
           location: debian-signed
@@ -481,13 +481,13 @@ jobs:
           cloudsmith-repository: << parameters.target_repository >>
           package-format: rpm
           package-distribution: any-distro/any-version
-          package-path: ~/artifacts/rpm-signed/jicmp-*.aarch64.rpm
+          package-path: ~/artifacts/rpm/jicmp-*.aarch64.rpm
       - cloudsmith/publish:
           allow-republish: true
           cloudsmith-repository: << parameters.target_repository >>
           package-format: rpm
           package-distribution: any-distro/any-version
-          package-path: ~/artifacts/rpm-signed/jicmp-*.x86_64.rpm
+          package-path: ~/artifacts/rpm/jicmp-*.x86_64.rpm
       - cloudsmith/publish:
           allow-republish: true
           cloudsmith-repository: << parameters.target_repository >>
