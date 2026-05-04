@@ -46,12 +46,11 @@ java-classes: java.built
 
 java.built: $(JAVA_FILES) pom.xml
 	-mkdir -p $(classdir)
-	$(JAVAC) $(JAVACFLAGS) -source $(JAVA_TARGET_VERSION) -target $(JAVA_TARGET_VERSION) -d $(classdir) $(JAVA_FILES) && touch java.built
+	$(JAVAC) $(JAVACFLAGS) --release $(JAVA_TARGET_VERSION) -h . -d $(classdir) $(JAVA_FILES) && touch java.built
 
 IcmpSocket.c: org_opennms_protocols_icmp_IcmpSocket.h
 
 org_opennms_protocols_icmp_IcmpSocket.h: java.built
-	$(JAVAH) -classpath $(classdir) org.opennms.protocols.icmp.IcmpSocket
 
 jicmp.jar: java.built
 	cd $(classdir) && \
