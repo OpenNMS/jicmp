@@ -79,11 +79,11 @@
   <distributionManagement>
     <snapshotRepository>
       <id>opennms-ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <url>https://central.sonatype.com/repository/maven-snapshots</url>
     </snapshotRepository>
     <repository>
       <id>opennms-ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+      <url>https://central.sonatype.com/repository/maven-releases</url>
     </repository>
   </distributionManagement>
   <build>
@@ -141,7 +141,7 @@
         <extensions>true</extensions>
         <configuration>
           <serverId>opennms-ossrh</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <nexusUrl>https://central.sonatype.com/</nexusUrl>
           <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
