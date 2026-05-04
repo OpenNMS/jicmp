@@ -11,7 +11,7 @@ parameters:
     default: bookworm
   maven-version:
     type: string
-    default: 3.8.9
+    default: 3.9.15
   # use the oldest version
   xcode-version:
     type: string
